@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>사내 커피 매니저 (익명 인증 도입)</title>
+    <title>커피 매니저</title>
     <style>
         :root { --primary: #00704A; --bg: #f4f4f2; }
         body { font-family: 'Pretendard', sans-serif; background: #333; margin: 0; padding: 0; display: flex; justify-content: center; }
@@ -11,7 +11,8 @@
         header { background: var(--primary); color: white; padding: 18px; text-align: center; flex-shrink: 0; }
         main { flex: 1; overflow-y: auto; padding-bottom: 90px; -webkit-overflow-scrolling: touch; }
         .card { margin: 15px; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
-        .bean-img { width: 100%; height: auto; max-height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #fdfdfd; cursor: zoom-in; }
+        /* 팝업 모달 전용 이미지 스타일 (잘림 방지) */
+        .modal-bean-img { width: 100%; height: auto; max-height: 350px; object-fit: contain; border-radius: 12px; margin-bottom: 12px; background: #f9f9f9; cursor: zoom-in; }
         
         #img-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; justify-content:center; align-items:center; cursor: zoom-out; }
         #img-modal img { max-width: 95%; max-height: 95%; border-radius: 10px; }
@@ -56,11 +57,11 @@
 
 <div id="cand-modal">
     <div class="cand-modal-content">
-        <button class="cand-close-btn" onclick="closeCandModal()">✕</button>
+        <button class="cand-close-btn" onclick="window.closeCandModal()">✕</button>
         <h3 id="cm-name" style="margin-top:5px; padding-right: 30px;">원두 이름</h3>
-        <img id="cm-img" class="bean-img hidden">
+        <img id="cm-img" class="modal-bean-img hidden" onclick="window.zoomImg(this.src)">
         <div id="cm-notes" style="margin-bottom: 15px;"></div>
-        <div id="cm-recipe" class="recipe-box hidden">레시피 가이드</div>
+        <div id="cm-recipe" class="recipe-box hidden"></div>
     </div>
 </div>
 
