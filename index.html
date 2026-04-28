@@ -291,10 +291,14 @@
             state.candidates[editingIndex].notes = document.getElementById('admin-notes').value;
             state.candidates[editingIndex].recipe = document.getElementById('admin-recipe').value;
             if(tempImgData) state.candidates[editingIndex].img = tempImgData;
+            
+            // [추가된 핵심 코드] 수정 완료 시 해당 후보의 투표수를 0으로 강제 초기화!
+            state.candidates[editingIndex].votes = 0; 
+            
             editingIndex = -1; tempImgData = "";
             document.getElementById('btn-save-edit').style.display = 'none';
             document.getElementById('admin-form-title').innerText = "데이터 설정 (이미지 수정 가능)";
-            window.clearAdminInputs(); saveToServer("후보 수정 완료");
+            window.clearAdminInputs(); saveToServer("후보 수정 완료! 투표수가 0으로 리셋되었습니다.");
         }
     }
 
