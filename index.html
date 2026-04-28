@@ -51,6 +51,35 @@
         .note-badge { display: inline-block; padding: 4px 12px; background: #f0f0f0; border-radius: 20px; font-size: 11px; margin-right: 5px; margin-top: 5px; }
         .recipe-box { margin: 10px 0; font-size: 13px; color: #555; background: #fafafa; padding: 12px; border-radius: 8px; white-space: pre-line; border-left: 4px solid #ddd; }
         .hidden { display: none; }
+        /* [가로형 대응] 화면 높이가 낮을 때 스타일 조절 */
+        @media (orientation: landscape) {
+            .container {
+                max-width: 100%; /* 가로형일 땐 화면 전체 사용 */
+            }
+            main {
+                display: flex;
+                flex-wrap: wrap;
+                padding-bottom: 75px;
+            }
+            section {
+                display: flex;
+                width: 100%;
+                gap: 10px;
+                padding: 10px;
+            }
+            .card {
+                flex: 1;
+                margin: 5px;
+                padding: 15px;
+            }
+            /* 가로 모드에서 이미지가 너무 크면 스크롤이 생기므로 높이 제한 */
+            .bean-img {
+                max-height: 150px;
+            }
+            .modal-bean-img {
+                max-height: 250px;
+            }
+        }
     </style>
 </head>
 <body>
