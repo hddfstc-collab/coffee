@@ -308,31 +308,30 @@
         document.getElementById('admin-recipe').value = ""; document.getElementById('img-selector').value = "";
     }
 
-    // 1. 맛 평가 함수 (평가 후 투표 탭으로 자동 이동)
+    // 1. 맛 평가 함수 (강제 클릭 방식으로 확실하게 전환)
     window.castTaste = function(type) { 
         if(!state) return;
         
         state.current.taste[type]++; 
-        saveToServer("평가 감사합니다! 다음 원두도 골라주세요. 😊"); 
+        saveToServer(); // 알림창 띄우지 않음
         
-        // 2초 뒤에 '다음 원두 투표' 탭으로 자동으로 화면을 넘겨줍니다.
+        // 1.2초 뒤에 하단에 있는 '다음 원두 투표' 버튼을 강제로 클릭하게 만듭니다.
         setTimeout(() => { 
-            // navTo 함수를 호출하여 'poll' 섹션으로 이동
-            window.navTo('poll', '다음 원두 투표', document.querySelectorAll('.nav-item')[1]);
-        }, 2000);
+            const pollTab = document.querySelectorAll('.nav-item')[1];
+            if (pollTab) pollTab.click(); // 확실한 화면 전환!
+        }, 1200);
     }
     
-    // 2. 투표 함수 (투표 후 다음 사람을 위해 홈으로 리셋)
+    // 2. 투표 함수 (1.5초 뒤 초기화)
     window.castVote = function(i) { 
         if(!state) return;
         
         state.candidates[i].votes++; 
-        saveToServer("투표 완료! 참여해 주셔서 감사합니다. ✨"); 
+        saveToServer(); 
         
-        // 투표까지 끝났으므로 3초 뒤에 첫 화면(홈)으로 새로고침하여 다음 사람을 기다립니다.
         setTimeout(() => { 
             location.reload(); 
-        }, 3000);
+        }, 1500);
     }
 
     window.render = function() {
