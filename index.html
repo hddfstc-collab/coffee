@@ -308,26 +308,31 @@
         document.getElementById('admin-recipe').value = ""; document.getElementById('img-selector').value = "";
     }
 
-    // [수정] 공용 패드용: 중복 방지 해제 및 자동 리셋 로직
+    // 1. 맛 평가 함수 (평가 후 투표 탭으로 자동 이동)
     window.castTaste = function(type) { 
         if(!state) return;
         
-        // 중복 체크 로직을 삭제하여 누구나 계속 참여 가능하게 함
         state.current.taste[type]++; 
-        saveToServer("평가 감사합니다! (잠시 후 리셋)"); 
+        saveToServer("평가 감사합니다! 다음 원두도 골라주세요. 😊"); 
         
-        // 3초 뒤 화면을 새로고침하여 다음 사람 준비
-        setTimeout(() => { location.reload(); }, 3000);
+        // 2초 뒤에 '다음 원두 투표' 탭으로 자동으로 화면을 넘겨줍니다.
+        setTimeout(() => { 
+            // navTo 함수를 호출하여 'poll' 섹션으로 이동
+            window.navTo('poll', '다음 원두 투표', document.querySelectorAll('.nav-item')[1]);
+        }, 2000);
     }
     
+    // 2. 투표 함수 (투표 후 다음 사람을 위해 홈으로 리셋)
     window.castVote = function(i) { 
         if(!state) return;
         
         state.candidates[i].votes++; 
-        saveToServer("투표 완료! 다음 분을 위해 리셋됩니다."); 
+        saveToServer("투표 완료! 참여해 주셔서 감사합니다. ✨"); 
         
-        // 3초 뒤 화면을 새로고침하여 다음 사람 준비
-        setTimeout(() => { location.reload(); }, 3000);
+        // 투표까지 끝났으므로 3초 뒤에 첫 화면(홈)으로 새로고침하여 다음 사람을 기다립니다.
+        setTimeout(() => { 
+            location.reload(); 
+        }, 3000);
     }
 
     window.render = function() {
