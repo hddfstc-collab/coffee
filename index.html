@@ -186,8 +186,10 @@
     let currentUid = null; // 현재 사용자의 고유 익명 ID
     const graphColors = ['#00704A', '#ffc107', '#4285F4', '#ea4335', '#9c27b0', '#00bcd4'];
 
-    // 기본 데이터 형태 (voters 배열이 추가되어 서버에서 UID를 기억합니다)
+    // [수정] 기본 데이터 형태 (마감 상태와 보관함 추가)
     const defaultState = {
+        status: "open", // 'open'은 투표중, 'closed'는 마감됨
+        archive: [], // 과거 기록을 모아둘 창고
         current: { name: "원두를 등록해주세요", img: "", notes: "", recipe: "관리자 메뉴에서 설정해주세요.", taste: { good: 0, bad: 0 } },
         candidates: [],
         voters: { taste: [], poll: [] } // [핵심] 투표한 사람들의 UID를 저장하는 명부
