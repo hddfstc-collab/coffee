@@ -144,10 +144,20 @@
                     <button class="btn-outline" id="btn-save-edit" onclick="saveEdit()" style="display:none; border-color:coral; color:coral;">선택한 후보 수정 완료</button>
                 </div>
             </div>
+
             <div class="card">
                 <h3>후보 관리</h3>
                 <div id="admin-poll-manage"></div>
                 <button onclick="resetApp()" style="color:red; margin-top:20px; font-size:11px; background:none; border:none; cursor:pointer;">[서버 데이터 전체 초기화]</button>
+            </div>
+
+            <div class="card">
+                <h3>시즌 관리 및 기록 📚</h3>
+                <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <button class="btn-main" onclick="toggleVoting()" id="btn-toggle-vote">투표 마감하기 (버튼 잠금)</button>
+                    <button class="btn-outline" onclick="archiveCurrentPoll()">💾 현재 결과 기록보관함에 저장 (새 시즌 시작)</button>
+                    <button class="btn-outline" onclick="showArchive()" style="border-color:#000; color:#000;">📋 지난 기록 요약 보기</button>
+                </div>
             </div>
         </section>
     </main>
