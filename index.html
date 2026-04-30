@@ -156,7 +156,7 @@
                 <div style="display: flex; gap: 10px; flex-direction: column;">
                     <button class="btn-main" onclick="toggleVoting()" id="btn-toggle-vote">투표 마감하기 (버튼 잠금)</button>
                     <button class="btn-outline" onclick="archiveCurrentPoll()">💾 현재 결과 기록보관함에 저장 (새 시즌 시작)</button>
-                    <button class="btn-outline" onclick="showArchive()" style="border-color:#000; color:#000;">📋 지난 기록 요약 보기</button>
+                    <button class="btn-outline" onclick="downloadArchiveCSV()" style="border-color:#107c41; color:#107c41; font-weight:bold;">📊 지난 기록 엑셀(CSV)로 다운로드</button></button>
                 </div>
             </div>
         </section>
@@ -411,12 +411,15 @@
         document.getElementById('btn-bad').disabled = isClosed;
 
         // [투표 화면]
-        const totalVotes = state.candidates.reduce((sum, c) => sum + c.votes, 0);
+        // 활성화(숨기지 않은) 후보들만 계산에 포함
+        const activeCandidates = state.candidates.filter(c => c.active !== false);
+        const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
         
         let summaryHtml = "";
         if(totalVotes > 0) {
             let maxVotes = 0; let topCand = ""; let segments = "";
             state.candidates.forEach((c, i) => {
+                if(c.active === false) return; // 비활성화 후보는 패스
                 if (c.votes > maxVotes) { maxVotes = c.votes; topCand = c.name; }
                 if (c.votes > 0) {
                     const pct = (c.votes / totalVotes) * 100;
@@ -433,6 +436,8 @@
         document.getElementById('poll-summary').innerHTML = summaryHtml;
 
         document.getElementById('poll-list').innerHTML = state.candidates.map((c, i) => {
+            if(c.active === false) return ''; // 비활성화 후보는 화면에 안 그림!
+
             const percent = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0;
             const imgSrc = c.img ? c.img : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' fill='%23999' font-size='10' font-family='sans-serif' text-anchor='middle' dy='.3em'%3ENo Img%3C/text%3E%3C/svg%3E";
             const barColor = graphColors[i % graphColors.length];
@@ -451,15 +456,22 @@
         }).join('') || "<div style='padding:20px; text-align:center; color:#999; font-size:14px;'>관리자가 후보를 등록할 때까지 기다려주세요.</div>";
 
         // [관리자 화면]
-        document.getElementById('admin-poll-manage').innerHTML = state.candidates.map((c, i) => `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px;">
-                <span style="flex:1;">${c.name}</span>
+        document.getElementById('admin-poll-manage').innerHTML = state.candidates.map((c, i) => {
+            const isActive = c.active !== false; // 활성화 여부
+            return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px; opacity: ${isActive ? '1' : '0.5'};">
+                <span style="flex:1;">
+                    ${c.name} 
+                    ${isActive ? '' : '<span style="color:red; font-size:11px; font-weight:bold;">(숨김 처리됨)</span>'}
+                </span>
                 <div>
+                    <button onclick="toggleCandidate(${i})" style="width:auto; padding:4px 10px; background:${isActive ? '#777' : 'var(--primary)'}; color:white; border-radius:5px; margin-right:5px;">${isActive ? '숨기기' : '활성화'}</button>
                     <button onclick="loadForEdit(${i})" style="width:auto; padding:4px 10px; background:var(--primary); color:white; border-radius:5px; margin-right:5px;">수정</button>
                     <button onclick="deleteCandidate(${i})" style="width:auto; padding:4px 10px; background:red; color:white; border-radius:5px;">삭제</button>
                 </div>
             </div>
-        `).join('') || "등록된 후보 없음";
+            `;
+        }).join('') || "등록된 후보 없음";
 
         // [추가] 관리자 마감 스위치 버튼 모양 바꾸기
         const toggleBtn = document.getElementById('btn-toggle-vote');
@@ -514,24 +526,51 @@
         await saveToServer("성공적으로 기록이 보관되고 새 시즌이 시작되었습니다!");
     }
 
-    // 3. 지난 기록 팝업창으로 예쁘게 보기
-    window.showArchive = function() {
-        if(!state || !state.archive || state.archive.length === 0) return alert("아직 보관된 과거 기록이 없습니다.");
-        
-        let msg = "📚 [지난 투표 요약 기록]\n\n";
+   // 3. 기록 엑셀(CSV) 다운로드 기능
+    window.downloadArchiveCSV = function() {
+        if(!state || !state.archive || state.archive.length === 0) return alert("다운로드할 기록이 없습니다.");
+
+        // 엑셀에서 한글이 깨지지 않도록 BOM(\uFEFF) 추가
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+        csvContent += "회차,기록날짜,마셨던 원두,추천(👍),비추천(👎),다음 투표 1위(표수)\n";
+
         state.archive.forEach((arc, idx) => {
-            msg += `■ ${idx + 1}회차 (${arc.date})\n`;
-            msg += `- 마셨던 원두: ${arc.beanName} (👍${arc.taste.good} 👎${arc.taste.bad})\n`;
+            let round = idx + 1;
+            let date = arc.date || "날짜없음";
+            // 원두 이름에 쉼표가 있으면 엑셀 칸이 밀리므로 쉼표 제거
+            let bean = (arc.beanName || "").replace(/,/g, ' '); 
+            let good = arc.taste ? arc.taste.good : 0;
+            let bad = arc.taste ? arc.taste.bad : 0;
             
-            // 그 당시 투표 1위 찾기
-            let topCand = [...arc.candidates].sort((a,b) => b.votes - a.votes)[0];
-            if(topCand && topCand.votes > 0) {
-                msg += `- 다음 투표 1위: ${topCand.name} (${topCand.votes}표)\n\n`;
-            } else {
-                msg += `- 투표 내역 없음\n\n`;
+            let topCandName = "없음";
+            let topCandVotes = 0;
+            if(arc.candidates && arc.candidates.length > 0) {
+                let topCand = [...arc.candidates].sort((a,b) => b.votes - a.votes)[0];
+                if(topCand && topCand.votes > 0) {
+                    topCandName = topCand.name.replace(/,/g, ' ');
+                    topCandVotes = topCand.votes;
+                }
             }
+            csvContent += `${round},${date},${bean},${good},${bad},${topCandName}(${topCandVotes}표)\n`;
         });
-        alert(msg);
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "커피매니저_시즌기록.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // 4. 후보 활성화/비활성화 (숨기기) 기능
+    window.toggleCandidate = function(i) {
+        if(!state) return;
+        // active 값이 없으면(옛날 데이터) 기본적으로 true(활성화)로 간주
+        const currentActive = state.candidates[i].active !== false; 
+        state.candidates[i].active = !currentActive; // 상태 반전
+        
+        saveToServer(`'${state.candidates[i].name}' 후보가 ${!currentActive ? '목록에 표시' : '숨김 처리'} 되었습니다.`);
     }
 </script>
 </body>
