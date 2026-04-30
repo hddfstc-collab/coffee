@@ -219,8 +219,12 @@
     onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
             state = docSnap.data();
-            // 구버전 데이터 호환성을 위해 voters 객체가 없으면 만들어줍니다.
+            
+            // [방어막 추가] 옛날 데이터에 없는 항목들을 자동으로 채워줍니다!
             if(!state.voters) state.voters = { taste: [], poll: [] };
+            if(!state.archive) state.archive = []; 
+            if(!state.status) state.status = "open"; 
+            
             window.render();
         } else {
             setDoc(docRef, defaultState);
@@ -349,9 +353,8 @@
     window.render = function() {
         if (!state) return;
 
-        // 공용 패드에서는 버튼 비활성화를 하지 않으므로 항상 false로 설정
-        const hasVotedTaste = false;
-        const hasVotedPoll = false;
+        // [추가] 현재 마감 상태인지 확인합니다.
+        const isClosed = state.status === "closed"; 
 
         // [홈 화면]
         document.getElementById('view-bean-name').innerText = state.current.name;
@@ -371,9 +374,10 @@
         document.getElementById('bad-count').innerText = `맛없다 ${t.bad}`;
         document.getElementById('taste-bar').style.width = totalT > 0 ? (t.good / totalT * 100) + "%" : "50%";
         
-        // 버튼은 항상 활성화 상태 유지
-        document.getElementById('btn-good').disabled = false;
-        document.getElementById('btn-bad').disabled = false;
+        // [핵심 변경] 마감 상태(isClosed)면 맛 평가 버튼이 잠깁니다!
+        document.getElementById('btn-good').disabled = isClosed;
+        document.getElementById('btn-bad').disabled = isClosed;
+
         // [투표 화면]
         const totalVotes = state.candidates.reduce((sum, c) => sum + c.votes, 0);
         
@@ -408,7 +412,9 @@
                         <div class="vote-info" style="font-size:11px;"><span>${c.votes}표</span><span>${percent}%</span></div>
                         <div class="vote-bar-container" style="margin:5px 0 0 0; height:6px;"><div class="vote-bar-fill" style="width:${percent}%; background:${barColor};"></div></div>
                     </div>
-                    <button class="btn-vote thumb-btn" onclick="castVote(${i})" ${hasVotedPoll ? 'disabled' : ''}>투표</button>
+                    <button class="btn-vote thumb-btn" onclick="castVote(${i})" ${isClosed ? 'disabled' : ''}>
+                        ${isClosed ? '마감됨' : '투표'}
+                    </button>
                 </div>`;
         }).join('') || "<div style='padding:20px; text-align:center; color:#999; font-size:14px;'>관리자가 후보를 등록할 때까지 기다려주세요.</div>";
 
@@ -422,6 +428,13 @@
                 </div>
             </div>
         `).join('') || "등록된 후보 없음";
+
+        // [추가] 관리자 마감 스위치 버튼 모양 바꾸기
+        const toggleBtn = document.getElementById('btn-toggle-vote');
+        if(toggleBtn) {
+            toggleBtn.innerText = isClosed ? "투표 다시 열기 (잠금 해제)" : "투표 마감하기 (버튼 잠금)";
+            toggleBtn.style.background = isClosed ? "#000" : "var(--primary)";
+        }
     }
 
     window.resetApp = function() { 
