@@ -220,15 +220,19 @@
         if (docSnap.exists()) {
             state = docSnap.data();
             
-            // [방어막 추가] 옛날 데이터에 없는 항목들을 자동으로 채워줍니다!
             if(!state.voters) state.voters = { taste: [], poll: [] };
             if(!state.archive) state.archive = []; 
             if(!state.status) state.status = "open"; 
             
             window.render();
         } else {
+            // 진짜로 데이터가 처음 만들어질 때만 세팅
             setDoc(docRef, defaultState);
         }
+    }, (error) => {
+        // [핵심] 이제 에러가 나거나 권한이 막혀도 절대 덮어쓰지 않고 가만히 기다립니다!
+        console.error("서버 연결 에러 (초기화 안 함!):", error);
+        alert("서버와 통신할 수 없습니다. (데이터는 안전합니다)");
     });
 
     async function saveToServer(msg) {
