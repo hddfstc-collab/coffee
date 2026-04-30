@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
@@ -156,7 +158,7 @@
                 <div style="display: flex; gap: 10px; flex-direction: column;">
                     <button class="btn-main" onclick="toggleVoting()" id="btn-toggle-vote">투표 마감하기 (버튼 잠금)</button>
                     <button class="btn-outline" onclick="archiveCurrentPoll()">💾 현재 결과 기록보관함에 저장 (새 시즌 시작)</button>
-                    <button class="btn-outline" onclick="downloadArchiveCSV()" style="border-color:#107c41; color:#107c41; font-weight:bold;">📊 지난 기록 엑셀(CSV)로 다운로드</button></button>
+                    <button class="btn-outline" onclick="downloadArchiveExcel()" style="border-color:#107c41; color:#107c41; font-weight:bold;">📊 시즌 기록 엑셀(.xlsx) 다운로드</button>
                 </div>
             </div>
         </section>
@@ -526,41 +528,55 @@
         await saveToServer("성공적으로 기록이 보관되고 새 시즌이 시작되었습니다!");
     }
 
-   // 3. 기록 엑셀(CSV) 다운로드 기능
-    window.downloadArchiveCSV = function() {
+   // 3. 진짜 엑셀(.xlsx) 파일 생성 및 다운로드 기능 (보안 프로그램 대응!)
+    window.downloadArchiveExcel = function() {
         if(!state || !state.archive || state.archive.length === 0) return alert("다운로드할 기록이 없습니다.");
 
-        // 엑셀에서 한글이 깨지지 않도록 BOM(\uFEFF) 추가
-        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
-        csvContent += "회차,기록날짜,마셨던 원두,추천(👍),비추천(👎),다음 투표 1위(표수)\n";
+        // 1. 엑셀에 넣을 데이터 배열 만들기 (헤더 포함)
+        const data = [
+            ["회차", "기록날짜", "마셨던 원두", "추천(👍)", "비추천(👎)", "다음 투표 1위", "득표수"]
+        ];
 
         state.archive.forEach((arc, idx) => {
-            let round = idx + 1;
-            let date = arc.date || "날짜없음";
-            // 원두 이름에 쉼표가 있으면 엑셀 칸이 밀리므로 쉼표 제거
-            let bean = (arc.beanName || "").replace(/,/g, ' '); 
-            let good = arc.taste ? arc.taste.good : 0;
-            let bad = arc.taste ? arc.taste.bad : 0;
-            
             let topCandName = "없음";
             let topCandVotes = 0;
             if(arc.candidates && arc.candidates.length > 0) {
                 let topCand = [...arc.candidates].sort((a,b) => b.votes - a.votes)[0];
                 if(topCand && topCand.votes > 0) {
-                    topCandName = topCand.name.replace(/,/g, ' ');
+                    topCandName = topCand.name;
                     topCandVotes = topCand.votes;
                 }
             }
-            csvContent += `${round},${date},${bean},${good},${bad},${topCandName}(${topCandVotes}표)\n`;
+            
+            data.push([
+                idx + 1,
+                arc.date || "날짜없음",
+                arc.beanName || "",
+                arc.taste ? arc.taste.good : 0,
+                arc.taste ? arc.taste.bad : 0,
+                topCandName,
+                topCandVotes
+            ]);
         });
 
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "커피매니저_시즌기록.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // 2. 엑셀 워크북 및 시트 생성
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // 3. 열 너비 자동 조절 (보기 좋게 칸 넓히기)
+        ws['!cols'] = [
+            {wch: 5}, {wch: 15}, {wch: 30}, {wch: 10}, {wch: 10}, {wch: 25}, {wch: 10}
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, "시즌기록");
+
+        // 4. 파일 다운로드 실행
+        try {
+            XLSX.writeFile(wb, "커피매니저_시즌기록.xlsx");
+        } catch (e) {
+            alert("엑셀 생성 중 오류가 발생했습니다. 클립보드 복사 방식을 사용해보세요.");
+            console.error(e);
+        }
     }
 
     // 4. 후보 활성화/비활성화 (숨기기) 기능
