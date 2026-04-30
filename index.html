@@ -430,6 +430,64 @@
             saveToServer("초기화 완료");
         } 
     }
+    // ==============================================
+    // 여기서부터 시즌 관리 및 기록 기능 함수들입니다!
+    // ==============================================
+
+    // 1. 투표 마감/시작 스위치
+    window.toggleVoting = async function() {
+        if(!state) return;
+        // 구버전 데이터 호환용
+        if(!state.status) state.status = "open"; 
+        
+        state.status = state.status === "closed" ? "open" : "closed";
+        await saveToServer(state.status === "closed" ? "투표가 마감되었습니다! (버튼 잠김)" : "투표가 다시 시작되었습니다!");
+        window.render();
+    }
+
+    // 2. 현재 결과 보관하고 초기화하기
+    window.archiveCurrentPoll = async function() {
+        if(!state) return;
+        if(!confirm("현재의 맛 평가와 투표 결과를 '보관함'에 저장하고, 표를 0으로 리셋하시겠습니까?")) return;
+
+        if(!state.archive) state.archive = []; // 보관함 없으면 생성
+        const today = new Date().toLocaleDateString('ko-KR');
+
+        // 현재 상태 사진 찍듯이 복사해서 보관함에 넣기
+        state.archive.push({
+            date: today,
+            beanName: state.current.name,
+            taste: { ...state.current.taste },
+            candidates: JSON.parse(JSON.stringify(state.candidates)) // 후보들 표 상태 그대로 복사
+        });
+
+        // 현재 화면 표 수 0으로 리셋
+        state.current.taste = { good: 0, bad: 0 };
+        state.candidates.forEach(c => c.votes = 0);
+        state.status = "open"; // 다시 투표 오픈 상태로
+
+        await saveToServer("성공적으로 기록이 보관되고 새 시즌이 시작되었습니다!");
+    }
+
+    // 3. 지난 기록 팝업창으로 예쁘게 보기
+    window.showArchive = function() {
+        if(!state || !state.archive || state.archive.length === 0) return alert("아직 보관된 과거 기록이 없습니다.");
+        
+        let msg = "📚 [지난 투표 요약 기록]\n\n";
+        state.archive.forEach((arc, idx) => {
+            msg += `■ ${idx + 1}회차 (${arc.date})\n`;
+            msg += `- 마셨던 원두: ${arc.beanName} (👍${arc.taste.good} 👎${arc.taste.bad})\n`;
+            
+            // 그 당시 투표 1위 찾기
+            let topCand = [...arc.candidates].sort((a,b) => b.votes - a.votes)[0];
+            if(topCand && topCand.votes > 0) {
+                msg += `- 다음 투표 1위: ${topCand.name} (${topCand.votes}표)\n\n`;
+            } else {
+                msg += `- 투표 내역 없음\n\n`;
+            }
+        });
+        alert(msg);
+    }
 </script>
 </body>
 </html>
