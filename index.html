@@ -12,7 +12,8 @@
         :root { --primary: #00704A; --bg: #f4f4f2; }
         body { font-family: 'Pretendard', sans-serif; background: #333; margin: 0; padding: 0; display: flex; justify-content: center; }
         .container { max-width: 500px; width: 100%; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        header { background: var(--primary); color: white; padding: 18px; text-align: center; flex-shrink: 0; }
+        header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; }
+        header h1 { margin: 0; font-size: 20px; font-weight: 600; }
         main { flex: 1; overflow-y: auto; padding-bottom: 90px; -webkit-overflow-scrolling: touch; }
         .card { margin: 15px; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
         /* 홈 화면 이미지는 다시 원래대로! (꽉 채우기) */
@@ -589,25 +590,33 @@
         
         saveToServer(`'${state.candidates[i].name}' 후보가 ${!currentActive ? '목록에 표시' : '숨김 처리'} 되었습니다.`);
     }
-    // 5. 후보 원두를 평가 원두로 바로 올리기
+    // 5. 후보 원두를 평가 원두로 바로 올리기 (새 시즌 시작!)
     window.setCandidateAsCurrent = function(i) {
         if(!state) return;
-        if(!confirm(`'${state.candidates[i].name}'을(를) 현재 마시는 평가 원두로 설정하시겠습니까?\n(기존 평가 원두의 맛 평가 기록은 리셋됩니다.)`)) return;
+        if(!confirm(`'${state.candidates[i].name}'을(를) 현재 마시는 평가 원두로 올리시겠습니까?\n(기존 맛 평가와 모든 후보의 투표수가 0으로 초기화되며 새 시즌이 시작됩니다.)`)) return;
 
-        // 후보 원두의 정보를 현재 원두로 싹 복사
+        // 1. 후보 원두의 정보를 현재 원두로 싹 복사
         state.current = {
             name: state.candidates[i].name,
             img: state.candidates[i].img || "",
             notes: state.candidates[i].notes || "",
             recipe: state.candidates[i].recipe || "",
-            taste: { good: 0, bad: 0 } // 맛 평가는 새출발
+            taste: { good: 0, bad: 0 } // 맛 평가 새출발
         };
 
-        // 평가 원두로 올라갔으니 해당 후보의 투표수도 0으로 깔끔하게 리셋
-        state.candidates[i].votes = 0; 
-        
-        saveToServer(`'${state.current.name}'(으)로 평가 원두가 변경되었습니다!`);
-        window.scrollTo(0,0); // 화면 맨 위로 이동해서 바로 확인 가능하게
+        // 2. [핵심] 모든 후보의 투표수를 0으로 싹 다 초기화!
+        state.candidates.forEach(c => c.votes = 0);
+
+        // 3. [핵심] 투표자 명부도 백지화해서 다들 새로 투표할 수 있게 리셋!
+        if(!state.voters) state.voters = { taste: [], poll: [] };
+        state.voters.taste = []; 
+        state.voters.poll = [];
+
+        // 4. 혹시 마감(closed) 상태였다면 다시 오픈(open)으로 변경
+        state.status = "open";
+
+        saveToServer(`새 시즌 시작! '${state.current.name}'(으)로 변경되고 모든 투표가 리셋되었습니다.`);
+        window.scrollTo(0,0);
     }
 </script>
 </body>
