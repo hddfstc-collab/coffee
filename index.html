@@ -461,15 +461,16 @@
         document.getElementById('admin-poll-manage').innerHTML = state.candidates.map((c, i) => {
             const isActive = c.active !== false; // 활성화 여부
             return `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px; opacity: ${isActive ? '1' : '0.5'};">
-                <span style="flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px; opacity: ${isActive ? '1' : '0.5'}; flex-wrap: wrap; gap: 5px;">
+                <span style="flex:1; min-width: 120px;">
                     ${c.name} 
-                    ${isActive ? '' : '<span style="color:red; font-size:11px; font-weight:bold;">(숨김 처리됨)</span>'}
+                    ${isActive ? '' : '<span style="color:red; font-size:11px; font-weight:bold;">(숨김)</span>'}
                 </span>
-                <div>
-                    <button onclick="toggleCandidate(${i})" style="width:auto; padding:4px 10px; background:${isActive ? '#777' : 'var(--primary)'}; color:white; border-radius:5px; margin-right:5px;">${isActive ? '숨기기' : '활성화'}</button>
-                    <button onclick="loadForEdit(${i})" style="width:auto; padding:4px 10px; background:var(--primary); color:white; border-radius:5px; margin-right:5px;">수정</button>
-                    <button onclick="deleteCandidate(${i})" style="width:auto; padding:4px 10px; background:red; color:white; border-radius:5px;">삭제</button>
+                <div style="display:flex; gap: 5px;">
+                    <button onclick="setCandidateAsCurrent(${i})" style="width:auto; padding:4px 8px; background:#4CAF50; color:white; border-radius:5px; font-size:12px;">현재원두로 올리기</button>
+                    <button onclick="toggleCandidate(${i})" style="width:auto; padding:4px 8px; background:${isActive ? '#777' : 'var(--primary)'}; color:white; border-radius:5px; font-size:12px;">${isActive ? '숨기기' : '활성화'}</button>
+                    <button onclick="loadForEdit(${i})" style="width:auto; padding:4px 8px; background:var(--primary); color:white; border-radius:5px; font-size:12px;">수정</button>
+                    <button onclick="deleteCandidate(${i})" style="width:auto; padding:4px 8px; background:red; color:white; border-radius:5px; font-size:12px;">삭제</button>
                 </div>
             </div>
             `;
@@ -587,6 +588,26 @@
         state.candidates[i].active = !currentActive; // 상태 반전
         
         saveToServer(`'${state.candidates[i].name}' 후보가 ${!currentActive ? '목록에 표시' : '숨김 처리'} 되었습니다.`);
+    }
+    // 5. 후보 원두를 평가 원두로 바로 올리기
+    window.setCandidateAsCurrent = function(i) {
+        if(!state) return;
+        if(!confirm(`'${state.candidates[i].name}'을(를) 현재 마시는 평가 원두로 설정하시겠습니까?\n(기존 평가 원두의 맛 평가 기록은 리셋됩니다.)`)) return;
+
+        // 후보 원두의 정보를 현재 원두로 싹 복사
+        state.current = {
+            name: state.candidates[i].name,
+            img: state.candidates[i].img || "",
+            notes: state.candidates[i].notes || "",
+            recipe: state.candidates[i].recipe || "",
+            taste: { good: 0, bad: 0 } // 맛 평가는 새출발
+        };
+
+        // 평가 원두로 올라갔으니 해당 후보의 투표수도 0으로 깔끔하게 리셋
+        state.candidates[i].votes = 0; 
+        
+        saveToServer(`'${state.current.name}'(으)로 평가 원두가 변경되었습니다!`);
+        window.scrollTo(0,0); // 화면 맨 위로 이동해서 바로 확인 가능하게
     }
 </script>
 </body>
