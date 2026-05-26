@@ -533,7 +533,7 @@
         await saveToServer("성공적으로 기록이 보관되고 새 시즌이 시작되었습니다!");
     }
 
-    // 3. 진짜 엑셀(.xlsx) 파일 다운로드 (오타 수정 완료 버전!)
+    // 3. 진짜 엑셀(.xlsx) 파일 다운로드 (오타 완벽 수정 완료!)
     window.downloadArchiveExcel = function() {
         if(!state || !state.archive || state.archive.length === 0) return alert("다운로드할 기록이 없습니다.");
 
@@ -549,7 +549,7 @@
                     topCandVotes = topCand.votes; 
                 }
             }
-            // 기존의 topBondVotes 오타를 지우고 topCandVotes로 정확하게 수정했습니다.
+            
             data.push([ 
                 idx + 1, 
                 arc.date || "날짜없음", 
@@ -573,6 +573,7 @@
             console.error(e); 
         }
     }
+
     // 4. 후보 활성화/비활성화 (숨기기)
     window.toggleCandidate = function(i) {
         if(!state) return;
