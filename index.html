@@ -533,19 +533,32 @@
         await saveToServer("성공적으로 기록이 보관되고 새 시즌이 시작되었습니다!");
     }
 
-    // 3. 진짜 엑셀(.xlsx) 파일 다운로드
+    // 3. 진짜 엑셀(.xlsx) 파일 다운로드 (오타 수정 완료 버전!)
     window.downloadArchiveExcel = function() {
         if(!state || !state.archive || state.archive.length === 0) return alert("다운로드할 기록이 없습니다.");
 
         const data = [ ["회차", "기록날짜", "마셨던 원두", "추천(👍)", "비추천(👎)", "다음 투표 1위", "득표수"] ];
 
         state.archive.forEach((arc, idx) => {
-            let topCandName = "없음"; let topCandVotes = 0;
+            let topCandName = "없음"; 
+            let topCandVotes = 0;
             if(arc.candidates && arc.candidates.length > 0) {
                 let topCand = [...arc.candidates].sort((a,b) => b.votes - a.votes)[0];
-                if(topCand && topCand.votes > 0) { topCandName = topCand.name; topCandVotes = topCand.votes; }
+                if(topCand && topCand.votes > 0) { 
+                    topCandName = topCand.name; 
+                    topCandVotes = topCand.votes; 
+                }
             }
-            data.push([ idx + 1, arc.date || "날짜없음", arc.beanName || "", arc.taste ? arc.taste.good : 0, arc.taste ? arc.taste.bad : 0, topCandName, topBondVotes || topCandVotes ]);
+            // 기존의 topBondVotes 오타를 지우고 topCandVotes로 정확하게 수정했습니다.
+            data.push([ 
+                idx + 1, 
+                arc.date || "날짜없음", 
+                arc.beanName || "", 
+                arc.taste ? arc.taste.good : 0, 
+                arc.taste ? arc.taste.bad : 0, 
+                topCandName, 
+                topCandVotes 
+            ]);
         });
 
         const wb = XLSX.utils.book_new();
@@ -553,10 +566,13 @@
         ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 30}, {wch: 10}, {wch: 10}, {wch: 25}, {wch: 10} ];
         XLSX.utils.book_append_sheet(wb, ws, "시즌기록");
 
-        try { XLSX.writeFile(wb, "커피매니저_시즌기록.xlsx"); } 
-        catch (e) { alert("엑셀 생성 오류 발생"); console.error(e); }
+        try { 
+            XLSX.writeFile(wb, "커피매니저_시즌기록.xlsx"); 
+        } catch (e) { 
+            alert("엑셀 생성 오류 발생"); 
+            console.error(e); 
+        }
     }
-
     // 4. 후보 활성화/비활성화 (숨기기)
     window.toggleCandidate = function(i) {
         if(!state) return;
