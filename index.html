@@ -226,6 +226,9 @@
         }
     }
 
+    // 자동 복귀를 위한 타이머 변수 추가
+    let autoReturnTimer = null; 
+
     window.navTo = function(id, title, el) {
         document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
         document.getElementById('section-' + id).classList.remove('hidden');
@@ -233,6 +236,17 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         if(el) el.classList.add('active');
         document.getElementById('content-area').scrollTop = 0;
+
+        // [핵심] 강제 지정 화면 자동 복귀 타이머 로직
+        clearTimeout(autoReturnTimer); // 화면을 옮기면 기존 타이머 초기화
+        
+        // 만약 '다음원두투표(poll)' 화면이고 & 강제 지정 모드가 켜져 있다면
+        if (id === 'poll' && state && state.forceNext && state.forceNext.enabled) {
+            autoReturnTimer = setTimeout(() => {
+                const homeTab = document.querySelectorAll('.nav-item')[0];
+                if(homeTab) window.navTo('home', '현재 원두 평가', homeTab);
+            }, 10000); // 10000 = 10초 뒤 자동 복귀 (시간은 여기서 수정하세요!)
+        }
     }
 
     window.adminLogin = function(el) { if(prompt("비밀번호") === "1234") window.navTo('admin', '관리자 설정', el); }
@@ -375,10 +389,11 @@
                 document.getElementById('poll-list').innerHTML = `
                     <div style="border: 2px solid #e91e63; padding: 20px; border-radius: 12px; background: #fff5f8;">
                         <h3 style="color:#e91e63; margin-top:0;">📢 다음 원두 확정!</h3>
-                        <p style="font-size:14px; color:#333; line-height: 1.5;">유통기한 관리를 위해 다음 원두는 <strong>[${nextBean.name}]</strong>(으)로 미리 결정되었습니다.</p>
-                        ${nextBean.img ? `<img src="${nextBean.img}" style="width:100%; max-height:200px; object-fit:contain; border-radius:10px; margin-bottom:10px; background:#fff;">` : ''}
+                        <p style="font-size:14px; color:#333; line-height: 1.5;">유통기한 관리를 위해 다음 원두는 <strong>[${nextBean.name}]</strong>(으)로 진행하겠습니다.</p>
+                        ${nextBean.img ? `<img src="${nextBean.img}" onclick="window.zoomImg(this.src)" style="width:100%; max-height:200px; object-fit:contain; border-radius:10px; margin-bottom:10px; background:#fff; cursor:zoom-in;">` : ''}
                         <div style="margin-bottom: 10px;">${nextBean.notes ? nextBean.notes.split(',').map(n => `<span class="note-badge" style="background:#ffdce5;">${n.trim()}</span>`).join('') : ''}</div>
                         ${nextBean.recipe ? `<div class="recipe-box" style="border-left-color: #e91e63; background: #fff;">${nextBean.recipe}</div>` : ''}
+                        <button class="btn-main" onclick="window.navTo('home', '현재 원두 평가', document.querySelectorAll('.nav-item')[0])" style="background:#e91e63; margin-top:15px; width:100%;">확인 (현재 원두 평가로 돌아가기)</button>
                     </div>
                 `;
             } else {
@@ -498,7 +513,6 @@
         if(!state.archive) state.archive = []; 
         const today = new Date().toLocaleDateString('ko-KR');
 
-        // 용량 낭비 주범인 '사진(img)', '특징(notes)', '레시피(recipe)'는 빼고 이름과 표수만 저장
         const lightCandidates = state.candidates.map(c => ({
             name: c.name,
             votes: c.votes
@@ -531,7 +545,7 @@
                 let topCand = [...arc.candidates].sort((a,b) => b.votes - a.votes)[0];
                 if(topCand && topCand.votes > 0) { topCandName = topCand.name; topCandVotes = topCand.votes; }
             }
-            data.push([ idx + 1, arc.date || "날짜없음", arc.beanName || "", arc.taste ? arc.taste.good : 0, arc.taste ? arc.taste.bad : 0, topCandName, topCandVotes ]);
+            data.push([ idx + 1, arc.date || "날짜없음", arc.beanName || "", arc.taste ? arc.taste.good : 0, arc.taste ? arc.taste.bad : 0, topCandName, topBondVotes || topCandVotes ]);
         });
 
         const wb = XLSX.utils.book_new();
