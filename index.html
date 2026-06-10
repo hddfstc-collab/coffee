@@ -398,18 +398,23 @@
             }
         }
 
-        // 💡 맛 평가 카드 제목 옆에 실시간 배지를 동적으로 꽂아줍니다.
-        const tasteTitleEl = document.querySelector('#section-home h3');
-        if (tasteTitleEl) {
-            tasteTitleEl.parentElement.style.position = 'relative'; // 배지 배치를 위한 기준점
-            tasteTitleEl.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 5px;">
-                    <span>오늘의 커피 맛 평가 ☕</span>
-                    <span style="font-size: 12px; background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-weight: bold; border: 1px solid #ffeeba; display: inline-block;">
-                        ${nextRankText}
-                    </span>
-                </div>
-            `;
+        // 💡 [안전 보정] 추천수 엘리먼트 기준으로 부모 카드를 찾아 h3 타이틀 옆에 배지를 확실하게 꽂아줍니다.
+        const goodCountEl = document.getElementById('good-count');
+        if (goodCountEl) {
+            const parentCard = goodCountEl.closest('.card');
+            if (parentCard) {
+                const tasteTitleEl = parentCard.querySelector('h3');
+                if (tasteTitleEl) {
+                    tasteTitleEl.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 5px;">
+                            <span>오늘의 커피 맛 평가 ☕</span>
+                            <span style="font-size: 12px; background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-weight: bold; border: 1px solid #ffeeba; display: inline-block;">
+                                ${nextRankText}
+                            </span>
+                        </div>
+                    `;
+                }
+            }
         }
 
         // [투표 화면 (강제 지정 모드 분기)]
