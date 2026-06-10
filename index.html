@@ -381,6 +381,37 @@
         document.getElementById('btn-good').disabled = isClosed;
         document.getElementById('btn-bad').disabled = isClosed;
 
+        // 💡 [실시간 다음 원두 1위 또는 확정 상태 계산 로직]
+        let nextRankText = "투표 진행 중";
+        if (state.forceNext && state.forceNext.enabled) {
+            const fx = state.candidates[state.forceNext.beanIndex];
+            nextRankText = fx ? `📢 확정: ${fx.name}` : "투표 진행 중";
+        } else {
+            const activeCandidates = state.candidates.filter(c => c.active !== false);
+            const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
+            if (totalVotes > 0) {
+                let maxVotes = 0; let topCandName = "";
+                activeCandidates.forEach(c => {
+                    if (c.votes > maxVotes) { maxVotes = c.votes; topCandName = c.name; }
+                });
+                if (maxVotes > 0) nextRankText = `🏆 1위: ${topCandName} (${maxVotes}표)`;
+            }
+        }
+
+        // 💡 맛 평가 카드 제목 옆에 실시간 배지를 동적으로 꽂아줍니다.
+        const tasteTitleEl = document.querySelector('#section-home h3');
+        if (tasteTitleEl) {
+            tasteTitleEl.parentElement.style.position = 'relative'; // 배지 배치를 위한 기준점
+            tasteTitleEl.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 5px;">
+                    <span>오늘의 커피 맛 평가 ☕</span>
+                    <span style="font-size: 12px; background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-weight: bold; border: 1px solid #ffeeba; display: inline-block;">
+                        ${nextRankText}
+                    </span>
+                </div>
+            `;
+        }
+
         // [투표 화면 (강제 지정 모드 분기)]
         if(state.forceNext && state.forceNext.enabled) {
             const nextBean = state.candidates[state.forceNext.beanIndex];
