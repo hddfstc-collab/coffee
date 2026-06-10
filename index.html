@@ -382,10 +382,15 @@
         document.getElementById('btn-bad').disabled = isClosed;
 
         // 💡 [실시간 다음 원두 1위 또는 확정 상태 계산 로직]
-        let nextRankText = "투표 진행 중";
+        let nextRankTitle = "🗳️ 다음 원두 투표 현황";
+        let nextRankContent = "아직 투표 내역이 없습니다.";
+        let nextRankStyle = "background: #fff; border-color: #eee;";
+
         if (state.forceNext && state.forceNext.enabled) {
             const fx = state.candidates[state.forceNext.beanIndex];
-            nextRankText = fx ? `📢 확정: ${fx.name}` : "투표 진행 중";
+            nextRankTitle = "📢 다음 원두 확정";
+            nextRankContent = fx ? `다음 원두는 <strong style="color: #e91e63;">${fx.name}</strong>(으)로 진행됩니다.` : "확정된 원두 정보가 없습니다.";
+            nextRankStyle = "background: #fff5f8; border: 1.5px solid #e91e63;"; // 확정일 때는 눈에 띄게 핑크색 톤
         } else {
             const activeCandidates = state.candidates.filter(c => c.active !== false);
             const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
@@ -394,26 +399,35 @@
                 activeCandidates.forEach(c => {
                     if (c.votes > maxVotes) { maxVotes = c.votes; topCandName = c.name; }
                 });
-                if (maxVotes > 0) nextRankText = `🏆 1위: ${topCandName} (${maxVotes}표)`;
+                if (maxVotes > 0) {
+                    nextRankContent = `현재 1위: <strong style="color: var(--primary); font-size: 18px;">🏆 ${topCandName}</strong> (${maxVotes}표)`;
+                }
             }
         }
 
-        // 💡 [안전 보정] 추천수 엘리먼트 기준으로 부모 카드를 찾아 h3 타이틀 옆에 배지를 확실하게 꽂아줍니다.
+        // 💡 [수정] 맛 평가 제목은 원래대로 돌려놓고, 그 아래에 새로운 실시간 카드를 동적으로 붙여줍니다.
         const goodCountEl = document.getElementById('good-count');
         if (goodCountEl) {
-            const parentCard = goodCountEl.closest('.card');
-            if (parentCard) {
-                const tasteTitleEl = parentCard.querySelector('h3');
-                if (tasteTitleEl) {
-                    tasteTitleEl.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 5px;">
-                            <span>오늘의 커피 맛 평가 ☕</span>
-                            <span style="font-size: 12px; background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 20px; font-weight: bold; border: 1px solid #ffeeba; display: inline-block;">
-                                ${nextRankText}
-                            </span>
-                        </div>
-                    `;
+            const tasteCard = goodCountEl.closest('.card');
+            if (tasteCard) {
+                // 1. 맛 평가 제목 원복 (배지 제거)
+                const tasteTitleEl = tasteCard.querySelector('h3');
+                if (tasteTitleEl) tasteTitleEl.innerHTML = `오늘의 커피 맛 평가 ☕`;
+
+                // 2. 맛 평가 카드 바로 뒤에 '다음 원두 현황 카드'가 없으면 새로 만들고, 있으면 내용만 업데이트합니다.
+                let statusCard = document.getElementById('live-status-card');
+                if (!statusCard) {
+                    statusCard = document.createElement('div');
+                    statusCard.id = 'live-status-card';
+                    statusCard.className = 'card';
+                    tasteCard.parentNode.insertBefore(statusCard, tasteCard.nextSibling);
                 }
+                // 카드 내부 스타일과 콘텐츠 주입
+                statusCard.style = nextRankStyle;
+                statusCard.innerHTML = `
+                    <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px;">${nextRankTitle}</h3>
+                    <div style="font-size: 15px; color: #333; line-height: 1.4;">${nextRankContent}</div>
+                `;
             }
         }
 
