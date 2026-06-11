@@ -14,12 +14,11 @@
         body { font-family: 'Pretendard', sans-serif; background: #333; margin: 0; padding: 0; display: flex; justify-content: center; }
         .container { max-width: 500px; width: 100%; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
-        /* 헤더 디자인 슬림하게 개선 */
         header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; }
         header h1 { margin: 0; font-size: 20px; font-weight: 600; }
         
         main { flex: 1; overflow-y: auto; padding-bottom: 90px; -webkit-overflow-scrolling: touch; }
-        .card { margin: 15px; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
+        .card { margin: 15px; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.06); box-sizing: border-box; }
         .bean-img { width: 100%; height: auto; max-height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #fdfdfd; cursor: zoom-in; }
 
         .modal-bean-img { width: 100%; height: auto; max-height: 350px; object-fit: contain; border-radius: 12px; margin-bottom: 12px; background: #f9f9f9; cursor: zoom-in; }
@@ -30,6 +29,7 @@
         .cand-modal-content { background: white; padding: 25px 20px; border-radius: 16px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .cand-close-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; color: #555; }
 
+        /* 투표 목록 스타일 */
         .thumb-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; gap: 12px; }
         .thumb-item:last-child { border-bottom: none; padding-bottom: 0; }
         .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; cursor: pointer; flex-shrink: 0; background: #fafafa; border: 1px solid #f0f0f0; }
@@ -38,6 +38,7 @@
         .thumb-btn { width: 65px; padding: 10px 0; margin: 0; font-size: 13px; flex-shrink: 0; border-radius: 8px; }
         .thumb-btn:disabled { background: #ccc !important; cursor: not-allowed; }
 
+        /* 게이지바 */
         .vote-bar-container { background: #eee; border-radius: 10px; height: 12px; width: 100%; margin: 10px 0; overflow: hidden; }
         .vote-bar-fill { background: var(--primary); height: 100%; transition: width 0.5s; width: 0%; }
         .vote-info { display: flex; justify-content: space-between; font-size: 13px; color: #666; font-weight: bold; }
@@ -52,22 +53,36 @@
         .btn-vote { background: #000; color: #fff; }
         
         .admin-input { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        /* 하단 네비게이션 */
         .nav { position: absolute; bottom: 0; width: 100%; display: flex; background: white; border-top: 1px solid #eee; height: 75px; align-items: center; z-index: 10; }
         .nav-item { flex: 1; text-align: center; cursor: pointer; font-size: 12px; color: #888; }
         .active { color: var(--primary); font-weight: bold; }
         
-        /* 배지 및 설명글 가독성 개선 */
         .note-badge { display: inline-block; padding: 5px 14px; background: #f0f0f0; border-radius: 20px; font-size: 13px; margin-right: 5px; margin-top: 5px; font-weight: 500; color: #333; }
         .recipe-box { margin: 10px 0; font-size: 15px; line-height: 1.5; color: #222; background: #fafafa; padding: 15px; border-radius: 8px; white-space: pre-line; border-left: 4px solid #ddd; }
         .hidden { display: none; }
+
+        /* 세로 모드 메인 레이아웃 기본값 */
+        #section-home { display: flex; flex-direction: column; width: 100%; }
+        #home-right-column { display: flex; flex-direction: column; width: 100%; }
         
+        /* 💡 핵심: 가로(Landscape) 모드일 때만 적용되는 2분할 반응형 웹 시트 */
         @media (orientation: landscape) {
             .container { max-width: 100%; }
-            main { display: flex; flex-wrap: wrap; padding-bottom: 75px; }
-            section { display: flex; width: 100%; gap: 10px; padding: 10px; }
-            .card { flex: 1; margin: 5px; padding: 15px; }
-            .bean-img { max-height: 150px; }
-            .modal-bean-img { max-height: 250px; }
+            main { padding-bottom: 75px; }
+            
+            /* 메인 화면을 가로 2분할 랩퍼로 변경 */
+            #section-home { display: flex; flex-direction: row; width: 100%; gap: 0; padding: 5px; box-sizing: border-box; align-items: flex-start; }
+            
+            /* 왼쪽 항목: 현재 원두 단독 배치 (가로 너비 50% 차지) */
+            #home-left-bean { flex: 1; width: 50%; }
+            
+            /* 오른쪽 항목: 두 가지 카드(맛 투표 + 현황)를 품는 세로 기둥 (가로 너비 50% 차지) */
+            #home-right-column { flex: 1; width: 50%; display: flex; flex-direction: column; }
+            
+            .card { margin: 10px; }
+            .bean-img { max-height: 180px; }
         }
     </style>
 </head>
@@ -90,20 +105,29 @@
 
     <main id="content-area">
         <section id="section-home">
-            <div class="card">
-                <h2 id="view-bean-name">데이터를 불러오는 중...</h2>
-                <img id="view-bean-img" class="bean-img hidden" onclick="zoomImg(this.src)">
-                <div id="view-notes" style="margin-bottom: 15px;"></div>
-                <div id="view-recipe" class="recipe-box hidden" style="border-left-color: var(--primary); background: #e6f4ea; color:#333;"></div>
+            <div id="home-left-bean">
+                <div class="card">
+                    <h2 id="view-bean-name" style="margin-top:0;">데이터를 불러오는 중...</h2>
+                    <img id="view-bean-img" class="bean-img hidden" onclick="zoomImg(this.src)">
+                    <div id="view-notes" style="margin-bottom: 15px;"></div>
+                    <div id="view-recipe" class="recipe-box hidden" style="border-left-color: var(--primary); background: #e6f4ea; color:#333;"></div>
+                </div>
             </div>
             
-            <div class="card">
-                <h3>오늘의 커피 맛 평가 ☕</h3>
-                <div class="vote-info"><span id="good-count">추천 0</span> <span id="bad-count">비추천 0</span></div>
-                <div class="vote-bar-container"><div id="taste-bar" class="vote-bar-fill" style="background:#ffc107;"></div></div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-outline" id="btn-good" onclick="castTaste('good')">👍 추천</button>
-                    <button class="btn-outline" id="btn-bad" onclick="castTaste('bad')">👎 비추천</button>
+            <div id="home-right-column">
+                <div class="card" id="taste-vote-card">
+                    <h3 style="margin-top: 0;">오늘의 커피 맛 평가 ☕</h3>
+                    <div class="vote-info"><span id="good-count">추천 0</span> <span id="bad-count">비추천 0</span></div>
+                    <div class="vote-bar-container"><div id="taste-bar" class="vote-bar-fill" style="background:#ffc107;"></div></div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-outline" id="btn-good" onclick="castTaste('good')">👍 추천</button>
+                        <button class="btn-outline" id="btn-bad" onclick="castTaste('bad')">👎 비추천</button>
+                    </div>
+                </div>
+                
+                <div class="card" id="live-status-card">
+                    <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px;">🗳️ 다음 원두 투표 현황</h3>
+                    <div id="live-status-content" style="font-size: 15px; color: #333; line-height: 1.4;">집계 중...</div>
                 </div>
             </div>
         </section>
@@ -182,6 +206,7 @@
     let tempImgData = "";
     let editingIndex = -1;
     let currentUid = null; 
+    let autoReturnTimer = null; // 자동 복귀 타이머 변수
     const graphColors = ['#00704A', '#ffc107', '#4285F4', '#ea4335', '#9c27b0', '#00bcd4'];
 
     const defaultState = {
@@ -194,12 +219,8 @@
     };
 
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUid = user.uid; 
-            if(state) window.render(); 
-        } else {
-            signInAnonymously(auth).catch(console.error);
-        }
+        if (user) { currentUid = user.uid; if(state) window.render(); } 
+        else { signInAnonymously(auth).catch(console.error); }
     });
 
     onSnapshot(docRef, (docSnap) => {
@@ -210,24 +231,13 @@
             if(!state.status) state.status = "open"; 
             if(!state.forceNext) state.forceNext = { enabled: false, beanIndex: 0 };
             window.render();
-        } else {
-            console.log("서버에 데이터가 없습니다. 관리자 메뉴에서 원두를 등록해주세요.");
         }
-    }, (error) => {
-        console.error("서버 연결 에러:", error);
-    });
+    }, (error) => { console.error("서버 연결 에러:", error); });
 
     async function saveToServer(msg) {
-        try {
-            await setDoc(docRef, state);
-            if (msg) alert(msg);
-        } catch (e) {
-            alert("서버 저장 실패! 네트워크를 확인하세요.");
-        }
+        try { await setDoc(docRef, state); if (msg) alert(msg); } 
+        catch (e) { alert("서버 저장 실패!"); }
     }
-
-    // 자동 복귀를 위한 타이머 변수 추가
-    let autoReturnTimer = null; 
 
     window.navTo = function(id, title, el) {
         document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
@@ -237,15 +247,14 @@
         if(el) el.classList.add('active');
         document.getElementById('content-area').scrollTop = 0;
 
-        // [핵심] 강제 지정 화면 자동 복귀 타이머 로직
-        clearTimeout(autoReturnTimer); // 화면을 옮기면 기존 타이머 초기화
+        clearTimeout(autoReturnTimer); // 화면 전환 시 기존 타이머 파괴
         
-        // 만약 '다음원두투표(poll)' 화면이고 & 강제 지정 모드가 켜져 있다면
+        // 다음원두 투표화면이고 강제 지정 모드가 ON일 때 10초 뒤 홈 화면 복귀 타이머 작동
         if (id === 'poll' && state && state.forceNext && state.forceNext.enabled) {
             autoReturnTimer = setTimeout(() => {
                 const homeTab = document.querySelectorAll('.nav-item')[0];
                 if(homeTab) window.navTo('home', '현재 원두 평가', homeTab);
-            }, 10000); // 10000 = 10초 뒤 자동 복귀 (시간은 여기서 수정하세요!)
+            }, 10000); 
         }
     }
 
@@ -253,20 +262,16 @@
     window.zoomImg = function(src) { document.getElementById('modal-img').src = src; document.getElementById('img-modal').style.display = 'flex'; }
     
     window.previewImg = function(input) {
-        const file = input.files[0];
-        if (!file) return;
+        const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const MAX_SIZE = 400; 
-                let width = img.width; let height = img.height;
+                const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                const MAX_SIZE = 400; let width = img.width; let height = img.height;
                 if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } 
                 else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
-                canvas.width = width; canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
+                canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
                 tempImgData = canvas.toDataURL('image/jpeg', 0.7);
             }
             img.src = e.target.result;
@@ -275,8 +280,7 @@
     }
 
     window.openCandModal = function(i) {
-        const c = state.candidates[i];
-        document.getElementById('cm-name').innerText = c.name;
+        const c = state.candidates[i]; document.getElementById('cm-name').innerText = c.name;
         const imgEl = document.getElementById('cm-img');
         if(c.img) { imgEl.src = c.img; imgEl.classList.remove('hidden'); } else { imgEl.classList.add('hidden'); }
         document.getElementById('cm-notes').innerHTML = c.notes ? c.notes.split(',').map(n => `<span class="note-badge">${n.trim()}</span>`).join('') : "";
@@ -295,14 +299,11 @@
             recipe: document.getElementById('admin-recipe').value || state.current.recipe,
             taste: { good: 0, bad: 0 }
         };
-        state.voters.taste = []; 
-        tempImgData = ""; window.clearAdminInputs(); saveToServer("현재 원두가 업데이트되었습니다. 맛 평가가 리셋됩니다.");
+        state.voters.taste = []; tempImgData = ""; window.clearAdminInputs(); saveToServer("현재 원두가 업데이트되었습니다.");
     }
 
     window.addCandidate = function() {
-        if(!state) return;
-        const name = document.getElementById('admin-name').value;
-        if(!name) return alert("이름을 입력하세요.");
+        if(!state) return; const name = document.getElementById('admin-name').value; if(!name) return alert("이름을 입력하세요.");
         state.candidates.push({ name, img: tempImgData, notes: document.getElementById('admin-notes').value, recipe: document.getElementById('admin-recipe').value, votes: 0, active: true });
         tempImgData = ""; window.clearAdminInputs(); saveToServer("후보가 추가되었습니다.");
     }
@@ -313,8 +314,7 @@
         document.getElementById('admin-notes').value = state.candidates[i].notes || "";
         document.getElementById('admin-recipe').value = state.candidates[i].recipe || "";
         document.getElementById('btn-save-edit').style.display = 'block';
-        document.getElementById('admin-form-title').innerText = "후보 수정 중...";
-        window.scrollTo(0,0);
+        document.getElementById('admin-form-title').innerText = "후보 수정 중..."; window.scrollTo(0,0);
     }
 
     window.saveEdit = function() {
@@ -323,12 +323,10 @@
             state.candidates[editingIndex].notes = document.getElementById('admin-notes').value;
             state.candidates[editingIndex].recipe = document.getElementById('admin-recipe').value;
             if(tempImgData) state.candidates[editingIndex].img = tempImgData;
-            state.candidates[editingIndex].votes = 0; 
-            
-            editingIndex = -1; tempImgData = "";
+            state.candidates[editingIndex].votes = 0; editingIndex = -1; tempImgData = "";
             document.getElementById('btn-save-edit').style.display = 'none';
             document.getElementById('admin-form-title').innerText = "데이터 설정 (이미지 수정 가능)";
-            window.clearAdminInputs(); saveToServer("후보 수정 완료! 투표수가 0으로 리셋되었습니다.");
+            window.clearAdminInputs(); saveToServer("후보 수정 완료! 투표수가 리셋됩니다.");
         }
     }
 
@@ -339,28 +337,19 @@
     }
 
     window.castTaste = function(type) { 
-        if(!state) return;
-        state.current.taste[type]++; 
-        saveToServer(); 
-        setTimeout(() => { 
-            const pollTab = document.querySelectorAll('.nav-item')[1];
-            if (pollTab) pollTab.click(); 
-        }, 1200);
+        if(!state) return; state.current.taste[type]++; saveToServer(); 
+        setTimeout(() => { const pollTab = document.querySelectorAll('.nav-item')[1]; if (pollTab) pollTab.click(); }, 1200);
     }
-    
     window.castVote = function(i) { 
-        if(!state) return;
-        state.candidates[i].votes++; 
-        saveToServer(); 
+        if(!state) return; state.candidates[i].votes++; saveToServer(); 
         setTimeout(() => { location.reload(); }, 1500);
     }
 
     window.render = function() {
         if (!state) return;
-
         const isClosed = state.status === "closed"; 
 
-        // [홈 화면]
+        // [홈 화면 - 1. 현재 사용 원두 데이터 맵핑]
         document.getElementById('view-bean-name').innerText = state.current.name;
         document.getElementById('view-notes').innerHTML = state.current.notes ? state.current.notes.split(',').map(n => `<span class="note-badge">${n.trim()}</span>`).join('') : "";
         
@@ -372,24 +361,22 @@
         if(state.current.img) { mainImg.src = state.current.img; mainImg.classList.remove('hidden'); }
         else { mainImg.classList.add('hidden'); }
         
-        const t = state.current.taste;
-        const totalT = t.good + t.bad;
+        // [홈 화면 - 2. 맛 투표 수치 맵핑]
+        const t = state.current.taste; const totalT = t.good + t.bad;
         document.getElementById('good-count').innerText = `추천 ${t.good}`;
-        document.getElementById('bad-count').innerText = `비추천 ${t.bad}`;
+        document.getElementById('bad-count').innerText = `비추chen ${t.bad}`;
         document.getElementById('taste-bar').style.width = totalT > 0 ? (t.good / totalT * 100) + "%" : "50%";
-        
-        document.getElementById('btn-good').disabled = isClosed;
-        document.getElementById('btn-bad').disabled = isClosed;
+        document.getElementById('btn-good').disabled = isClosed; document.getElementById('btn-bad').disabled = isClosed;
 
-        // 💡 [실시간 다음 원두 1위 또는 확정 상태 계산 로직]
+        // [홈 화면 - 3. 실시간 다음 원두 대형 현황판 연산]
         let nextRankTitle = "🗳️ 다음 원두 투표 현황";
         let nextRankContent = "아직 투표 내역이 없습니다.";
-        let nextRankStyle = "background: #fff; border-color: #eee;";
+        let nextRankStyle = "background: #fff; border: 1px solid #eee;";
 
         if (state.forceNext && state.forceNext.enabled) {
             const fx = state.candidates[state.forceNext.beanIndex];
             nextRankTitle = "📢 다음 원두 확정";
-            nextRankContent = fx ? `다음 원두는 <strong style="color: #e91e63;">${fx.name}</strong>(으)로 진행됩니다.` : "확정된 원두 정보가 없습니다.";
+            nextRankContent = fx ? `다음 원두는 <strong style="color: #e91e63; font-size:17px;">${fx.name}</strong>(으)로 진행하겠습니다.` : "확정된 원두 정보가 없습니다.";
             nextRankStyle = "background: #fff5f8; border: 1.5px solid #e91e63;"; 
         } else {
             const activeCandidates = state.candidates.filter(c => c.active !== false);
@@ -404,40 +391,15 @@
                 }
             }
         }
-
-        // 💡 [가로모드 전용 보정] 부모 섹션을 찾아서 무조건 위아래(flex-direction: column)로 흐르게 강제 제어합니다!
-        const goodCountEl = document.getElementById('good-count');
-        if (goodCountEl) {
-            const tasteCard = goodCountEl.closest('.card');
-            if (tasteCard) {
-                // 가로모드용 가로배치 CSS 간섭을 차단하기 위해 부모 section의 스타일을 세로형으로 바꿉니다.
-                const parentSection = tasteCard.closest('section');
-                if (parentSection) {
-                    parentSection.style.display = 'flex';
-                    parentSection.style.flexDirection = 'column';
-                    parentSection.style.width = '100%';
-                }
-
-                // 1. 맛 평가 카드 뒤에 '다음 원두 현황 카드'를 확실하게 위아래로 배치
-                let statusCard = document.getElementById('live-status-card');
-                if (!statusCard) {
-                    statusCard = document.createElement('div');
-                    statusCard.id = 'live-status-card';
-                    statusCard.className = 'card';
-                    tasteCard.parentNode.insertBefore(statusCard, tasteCard.nextSibling);
-                }
-                
-                // 가로 화면에서 카드가 뚱뚱하게 벌어지는 걸 막고 위아래로 이쁘게 쌓이도록 마진과 스타일 조정
-                statusCard.style = nextRankStyle;
-                statusCard.style.margin = '15px'; 
-                statusCard.innerHTML = `
-                    <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px;">${nextRankTitle}</h3>
-                    <div style="font-size: 15px; color: #333; line-height: 1.4;">${nextRankContent}</div>
-                `;
-            }
+        // 현황 카드에 정보 꼽기
+        const statusCard = document.getElementById('live-status-card');
+        if(statusCard) {
+            statusCard.style.cssText = nextRankStyle;
+            document.getElementById('live-status-content').innerHTML = nextRankContent;
+            statusCard.querySelector('h3').innerText = nextRankTitle;
         }
 
-        // [투표 화면 (강제 지정 모드 분기)]
+        // [투표 화면 분기 출력]
         if(state.forceNext && state.forceNext.enabled) {
             const nextBean = state.candidates[state.forceNext.beanIndex];
             document.getElementById('poll-summary').innerHTML = ''; 
@@ -450,93 +412,66 @@
                         <div style="margin-bottom: 10px;">${nextBean.notes ? nextBean.notes.split(',').map(n => `<span class="note-badge" style="background:#ffdce5;">${n.trim()}</span>`).join('') : ''}</div>
                         ${nextBean.recipe ? `<div class="recipe-box" style="border-left-color: #e91e63; background: #fff;">${nextBean.recipe}</div>` : ''}
                         <button class="btn-main" onclick="window.navTo('home', '현재 원두 평가', document.querySelectorAll('.nav-item')[0])" style="background:#e91e63; margin-top:15px; width:100%;">확인 (현재 원두 평가로 돌아가기)</button>
-                    </div>
-                `;
-            } else {
-                document.getElementById('poll-list').innerHTML = "<div style='padding:20px; text-align:center;'>강제 지정된 원두 데이터가 없습니다.</div>";
-            }
+                    </div>`;
+            } else { document.getElementById('poll-list').innerHTML = "<div style='padding:20px; text-align:center;'>강제 지정 데이터 없음</div>"; }
         } else {
-            // 정상 투표 화면
-            const activeCandidates = state.candidates.filter(c => c.active !== false);
-            const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
-            
+            const activeCandidates = state.candidates.filter(c => c.active !== false); const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
             let summaryHtml = "";
             if(totalVotes > 0) {
                 let maxVotes = 0; let topCand = ""; let segments = "";
                 state.candidates.forEach((c, i) => {
-                    if(c.active === false) return; 
-                    if (c.votes > maxVotes) { maxVotes = c.votes; topCand = c.name; }
+                    if(c.active === false) return; if (c.votes > maxVotes) { maxVotes = c.votes; topCand = c.name; }
                     if (c.votes > 0) {
-                        const pct = (c.votes / totalVotes) * 100;
-                        const color = graphColors[i % graphColors.length];
+                        const pct = (c.votes / totalVotes) * 100; const color = graphColors[i % graphColors.length];
                         segments += `<div class="stacked-segment" style="width:${pct}%; background:${color};"></div>`;
                     }
                 });
                 summaryHtml = `<div style="background:#fafafa; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #eee;">
                         <div style="font-size:13px; color:#555; margin-bottom:8px;">현재 1위: <strong style="color:var(--primary);">🏆 ${topCand}</strong></div>
                         <div class="stacked-bar">${segments}</div></div>`;
-            } else {
-                summaryHtml = `<div style="padding:15px; text-align:center; color:#999; font-size:13px; background:#fafafa; border-radius:12px; margin-bottom:20px; border:1px dashed #ddd;">아직 투표 내역이 없습니다.</div>`;
-            }
+            } else { summaryHtml = `<div style="padding:15px; text-align:center; color:#999; font-size:13px; background:#fafafa; border-radius:12px; margin-bottom:20px; border:1px dashed #ddd;">아직 투표 내역이 없습니다.</div>`; }
             document.getElementById('poll-summary').innerHTML = summaryHtml;
 
             document.getElementById('poll-list').innerHTML = state.candidates.map((c, i) => {
-                if(c.active === false) return ''; 
-                const percent = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0;
+                if(c.active === false) return ''; const percent = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0;
                 const imgSrc = c.img ? c.img : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' fill='%23999' font-size='10' font-family='sans-serif' text-anchor='middle' dy='.3em'%3ENo Img%3C/text%3E%3C/svg%3E";
                 const barColor = graphColors[i % graphColors.length];
-                return `
-                    <div class="thumb-item">
+                return `<div class="thumb-item">
                         <img src="${imgSrc}" class="thumb-img" onclick="openCandModal(${i})">
                         <div class="thumb-info" onclick="openCandModal(${i})">
                             <div class="thumb-name">${c.name}</div>
                             <div class="vote-info" style="font-size:11px;"><span>${c.votes}표</span><span>${percent}%</span></div>
                             <div class="vote-bar-container" style="margin:5px 0 0 0; height:6px;"><div class="vote-bar-fill" style="width:${percent}%; background:${barColor};"></div></div>
                         </div>
-                        <button class="btn-vote thumb-btn" onclick="castVote(${i})" ${isClosed ? 'disabled' : ''}>
-                            ${isClosed ? '마감됨' : '투표'}
-                        </button>
+                        <button class="btn-vote thumb-btn" onclick="castVote(${i})" ${isClosed ? 'disabled' : ''}>${isClosed ? '마감됨' : '투표'}</button>
                     </div>`;
-            }).join('') || "<div style='padding:20px; text-align:center; color:#999; font-size:14px;'>관리자가 후보를 등록할 때까지 기다려주세요.</div>";
+            }).join('') || "<div style='padding:20px; text-align:center; color:#999; font-size:14px;'>후보 대기 중</div>";
         }
 
-        // [관리자 화면: 강제 지정 모드 토글 UI]
+        // [관리자 화면 렌더링 스크립트]
         const forceEnabled = state.forceNext && state.forceNext.enabled;
         let selectOptions = state.candidates.map((c, i) => `<option value="${i}" ${state.forceNext.beanIndex == i ? 'selected' : ''}>${c.name}</option>`).join('');
-        
         document.getElementById('admin-force-manage').innerHTML = `
             <h3 style="margin-top:0;">다음 원두 강제 지정 📢</h3>
-            <p style="font-size:12px; color:#666; margin-top:0;">유통기한 관리를 위해 투표 대신 다음 원두를 고정합니다.</p>
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                 <button onclick="toggleForceMode()" style="width:auto; flex:1; padding:12px; font-size:14px; background:${forceEnabled ? '#e91e63' : '#777'}; color:white; border-radius:8px;">
                     ${forceEnabled ? 'ON (현재 강제 지정 중)' : 'OFF (현재 자유 투표 중)'}
                 </button>
             </div>
-            ${forceEnabled ? `
-                <select onchange="updateForceBean(this.value)" style="width:100%; padding:12px; border-radius:8px; border:1px solid #e91e63; font-size:14px; outline:none;">
-                    ${selectOptions || '<option>등록된 후보가 없습니다.</option>'}
-                </select>
-            ` : ''}
-        `;
+            ${forceEnabled ? `<select onchange="updateForceBean(this.value)" style="width:100%; padding:12px; border-radius:8px; border:1px solid #e91e63; font-size:14px;">${selectOptions || '<option>후보 없음</option>'}</select>` : ''}`;
 
-        // [관리자 화면: 후보 관리 리스트]
         document.getElementById('admin-poll-manage').innerHTML = state.candidates.map((c, i) => {
             const isActive = c.active !== false; 
-            return `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px; opacity: ${isActive ? '1' : '0.5'}; flex-wrap: wrap; gap: 5px;">
-                <span style="flex:1; min-width: 120px; font-weight: 500;">
-                    ${c.name} 
-                    ${isActive ? '' : '<span style="color:red; font-size:11px; font-weight:bold;">(숨김)</span>'}
-                </span>
+            return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px; opacity: ${isActive ? '1' : '0.5'}; flex-wrap: wrap; gap: 5px;">
+                <span style="flex:1; min-width: 120px; font-weight: 500;">${c.name} ${isActive ? '' : '<span style="color:red; font-size:11px;">(숨김)</span>'}</span>
                 <div style="display:flex; gap: 5px;">
                     <button onclick="setCandidateAsCurrent(${i})" style="width:auto; padding:5px 10px; background:#4CAF50; color:white; border-radius:5px; font-size:12px;">현재원두로 올리기</button>
                     <button onclick="toggleCandidate(${i})" style="width:auto; padding:5px 10px; background:${isActive ? '#777' : 'var(--primary)'}; color:white; border-radius:5px; font-size:12px;">${isActive ? '숨기기' : '활성화'}</button>
                     <button onclick="loadForEdit(${i})" style="width:auto; padding:5px 10px; background:var(--primary); color:white; border-radius:5px; font-size:12px;">수정</button>
                     <button onclick="deleteCandidate(${i})" style="width:auto; padding:5px 10px; background:red; color:white; border-radius:5px; font-size:12px;">삭제</button>
                 </div>
-            </div>
-            `;
-        }).join('') || "<div style='font-size:13px; color:#888;'>등록된 후보 없음</div>";
+            </div>`;
+        }).join('') || "<div style='font-size:13px; color:#888;'>후보 없음</div>";
 
         const toggleBtn = document.getElementById('btn-toggle-vote');
         if(toggleBtn) {
@@ -545,137 +480,62 @@
         }
     }
 
-    window.resetApp = function() { 
-        if(confirm("모든 투표 기록과 데이터를 초기화하시겠습니까? (복구 불가)")) { 
-            state = defaultState;
-            saveToServer("초기화 완료");
-        } 
-    }
+    window.resetApp = function() { if(confirm("전체 초기화하시겠습니까?")) { state = defaultState; saveToServer("초기화 완료"); } }
 
-    // 1. 투표 마감/시작 스위치
     window.toggleVoting = async function() {
-        if(!state) return;
-        if(!state.status) state.status = "open"; 
+        if(!state) return; if(!state.status) state.status = "open"; 
         state.status = state.status === "closed" ? "open" : "closed";
-        await saveToServer(state.status === "closed" ? "투표가 마감되었습니다! (버튼 잠김)" : "투표가 다시 시작되었습니다!");
-        window.render();
+        await saveToServer(state.status === "closed" ? "투표가 마감되었습니다!" : "투표가 시작되었습니다!"); window.render();
     }
 
-    // 2. 현재 결과 보관하고 초기화하기 (사진 제외 - 태블릿 로딩 속도 최적화)
     window.archiveCurrentPoll = async function() {
-        if(!state) return;
-        if(!confirm("현재의 맛 평가와 투표 결과를 '보관함'에 저장하고, 표를 0으로 리셋하시겠습니까?")) return;
-
-        if(!state.archive) state.archive = []; 
-        const today = new Date().toLocaleDateString('ko-KR');
-
-        const lightCandidates = state.candidates.map(c => ({
-            name: c.name,
-            votes: c.votes
-        }));
-
-        state.archive.push({
-            date: today,
-            beanName: state.current.name,
-            taste: { ...state.current.taste },
-            candidates: lightCandidates 
-        });
-
-        state.current.taste = { good: 0, bad: 0 };
-        state.candidates.forEach(c => c.votes = 0);
-        state.status = "open"; 
+        if(!state) return; if(!confirm("현재 결과를 보관함에 저장하고 새 시즌을 시작합니까?")) return;
+        if(!state.archive) state.archive = []; const today = new Date().toLocaleDateString('ko-KR');
+        const lightCandidates = state.candidates.map(c => ({ name: c.name, votes: c.votes }));
+        state.archive.push({ date: today, beanName: state.current.name, taste: { ...state.current.taste }, candidates: lightCandidates });
+        state.current.taste = { good: 0, bad: 0 }; state.candidates.forEach(c => c.votes = 0); state.status = "open"; 
         if(state.voters) { state.voters.taste = []; state.voters.poll = []; }
-
-        await saveToServer("성공적으로 기록이 보관되고 새 시즌이 시작되었습니다!");
+        await saveToServer("새 시즌이 시작되었습니다!");
     }
 
-    // 3. 진짜 엑셀(.xlsx) 파일 다운로드 (오타 완벽 수정 완료!)
     window.downloadArchiveExcel = function() {
         if(!state || !state.archive || state.archive.length === 0) return alert("다운로드할 기록이 없습니다.");
-
         const data = [ ["회차", "기록날짜", "마셨던 원두", "추천(👍)", "비추천(👎)", "다음 투표 1위", "득표수"] ];
-
         state.archive.forEach((arc, idx) => {
-            let topCandName = "없음"; 
-            let topCandVotes = 0;
+            let topCandName = "없음"; let topCandVotes = 0;
             if(arc.candidates && arc.candidates.length > 0) {
                 let topCand = [...arc.candidates].sort((a,b) => b.votes - a.votes)[0];
-                if(topCand && topCand.votes > 0) { 
-                    topCandName = topCand.name; 
-                    topCandVotes = topCand.votes; 
-                }
+                if(topCand && topCand.votes > 0) { topCandName = topCand.name; topCandVotes = topCand.votes; }
             }
-            
-            data.push([ 
-                idx + 1, 
-                arc.date || "날짜없음", 
-                arc.beanName || "", 
-                arc.taste ? arc.taste.good : 0, 
-                arc.taste ? arc.taste.bad : 0, 
-                topCandName, 
-                topCandVotes 
-            ]);
+            data.push([ idx + 1, arc.date || "날짜없음", arc.beanName || "", arc.taste ? arc.taste.good : 0, arc.taste ? arc.taste.bad : 0, topCandName, topCandVotes ]);
         });
-
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(data);
         ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 30}, {wch: 10}, {wch: 10}, {wch: 25}, {wch: 10} ];
         XLSX.utils.book_append_sheet(wb, ws, "시즌기록");
-
-        try { 
-            XLSX.writeFile(wb, "커피매니저_시즌기록.xlsx"); 
-        } catch (e) { 
-            alert("엑셀 생성 오류 발생"); 
-            console.error(e); 
-        }
+        try { XLSX.writeFile(wb, "커피매니저_시즌기록.xlsx"); } catch (e) { alert("엑셀 생성 오류"); }
     }
 
-    // 4. 후보 활성화/비활성화 (숨기기)
     window.toggleCandidate = function(i) {
-        if(!state) return;
-        const currentActive = state.candidates[i].active !== false; 
-        state.candidates[i].active = !currentActive; 
-        saveToServer(`'${state.candidates[i].name}' 후보가 ${!currentActive ? '목록에 표시' : '숨김 처리'} 되었습니다.`);
+        if(!state) return; const currentActive = state.candidates[i].active !== false; state.candidates[i].active = !currentActive; 
+        saveToServer(`후보 상태 변경 완료`);
     }
 
-    // 5. 후보 원두를 평가 원두로 바로 올리기 (투표 리셋)
     window.setCandidateAsCurrent = function(i) {
-        if(!state) return;
-        if(!confirm(`'${state.candidates[i].name}'을(를) 현재 마시는 평가 원두로 올리시겠습니까?\n(기존 맛 평가와 모든 후보의 투표수가 0으로 초기화되며 새 시즌이 시작됩니다.)`)) return;
-
-        state.current = {
-            name: state.candidates[i].name,
-            img: state.candidates[i].img || "",
-            notes: state.candidates[i].notes || "",
-            recipe: state.candidates[i].recipe || "",
-            taste: { good: 0, bad: 0 } 
-        };
-
-        state.candidates.forEach(c => c.votes = 0);
-        if(!state.voters) state.voters = { taste: [], poll: [] };
-        state.voters.taste = []; 
-        state.voters.poll = [];
-        state.status = "open";
-
-        saveToServer(`새 시즌 시작! '${state.current.name}'(으)로 변경되고 모든 투표가 리셋되었습니다.`);
-        window.scrollTo(0,0);
+        if(!state) return; if(!confirm(`'${state.candidates[i].name}'을 현재 원두로 올립니까?`)) return;
+        state.current = { name: state.candidates[i].name, img: state.candidates[i].img || "", notes: state.candidates[i].notes || "", recipe: state.candidates[i].recipe || "", taste: { good: 0, bad: 0 } };
+        state.candidates.forEach(c => c.votes = 0); if(!state.voters) state.voters = { taste: [], poll: [] };
+        state.voters.taste = []; state.voters.poll = []; state.status = "open";
+        saveToServer("현재 원두가 변경되고 투표가 리셋되었습니다."); window.scrollTo(0,0);
     }
 
-    // 6. 다음 원두 강제 지정 모드 토글
     window.toggleForceMode = function() {
-        if(!state) return;
-        if(!state.forceNext) state.forceNext = { enabled: false, beanIndex: 0 };
-        state.forceNext.enabled = !state.forceNext.enabled;
-        saveToServer("강제 지정 모드가 " + (state.forceNext.enabled ? "켜졌습니다." : "꺼졌습니다."));
+        if(!state) return; if(!state.forceNext) state.forceNext = { enabled: false, beanIndex: 0 };
+        state.forceNext.enabled = !state.forceNext.enabled; saveToServer("강제 지정 모드 토글 완료");
     };
 
-    // 7. 강제 지정할 원두 선택
     window.updateForceBean = function(idx) {
-        if(!state) return;
-        state.forceNext.beanIndex = idx;
-        saveToServer("다음 원두가 강제 지정되었습니다.");
+        if(!state) return; state.forceNext.beanIndex = idx; saveToServer("강제 지정 원두 변경 완료");
     };
-
 </script>
 </body>
 </html>
