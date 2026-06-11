@@ -390,7 +390,7 @@
             const fx = state.candidates[state.forceNext.beanIndex];
             nextRankTitle = "📢 다음 원두 확정";
             nextRankContent = fx ? `다음 원두는 <strong style="color: #e91e63;">${fx.name}</strong>(으)로 진행됩니다.` : "확정된 원두 정보가 없습니다.";
-            nextRankStyle = "background: #fff5f8; border: 1.5px solid #e91e63;"; // 확정일 때는 눈에 띄게 핑크색 톤
+            nextRankStyle = "background: #fff5f8; border: 1.5px solid #e91e63;"; 
         } else {
             const activeCandidates = state.candidates.filter(c => c.active !== false);
             const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
@@ -405,16 +405,20 @@
             }
         }
 
-        // 💡 [수정] 맛 평가 제목은 원래대로 돌려놓고, 그 아래에 새로운 실시간 카드를 동적으로 붙여줍니다.
+        // 💡 [가로모드 전용 보정] 부모 섹션을 찾아서 무조건 위아래(flex-direction: column)로 흐르게 강제 제어합니다!
         const goodCountEl = document.getElementById('good-count');
         if (goodCountEl) {
             const tasteCard = goodCountEl.closest('.card');
             if (tasteCard) {
-                // 1. 맛 평가 제목 원복 (배지 제거)
-                const tasteTitleEl = tasteCard.querySelector('h3');
-                if (tasteTitleEl) tasteTitleEl.innerHTML = `오늘의 커피 맛 평가 ☕`;
+                // 가로모드용 가로배치 CSS 간섭을 차단하기 위해 부모 section의 스타일을 세로형으로 바꿉니다.
+                const parentSection = tasteCard.closest('section');
+                if (parentSection) {
+                    parentSection.style.display = 'flex';
+                    parentSection.style.flexDirection = 'column';
+                    parentSection.style.width = '100%';
+                }
 
-                // 2. 맛 평가 카드 바로 뒤에 '다음 원두 현황 카드'가 없으면 새로 만들고, 있으면 내용만 업데이트합니다.
+                // 1. 맛 평가 카드 뒤에 '다음 원두 현황 카드'를 확실하게 위아래로 배치
                 let statusCard = document.getElementById('live-status-card');
                 if (!statusCard) {
                     statusCard = document.createElement('div');
@@ -422,8 +426,10 @@
                     statusCard.className = 'card';
                     tasteCard.parentNode.insertBefore(statusCard, tasteCard.nextSibling);
                 }
-                // 카드 내부 스타일과 콘텐츠 주입
+                
+                // 가로 화면에서 카드가 뚱뚱하게 벌어지는 걸 막고 위아래로 이쁘게 쌓이도록 마진과 스타일 조정
                 statusCard.style = nextRankStyle;
+                statusCard.style.margin = '15px'; 
                 statusCard.innerHTML = `
                     <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px;">${nextRankTitle}</h3>
                     <div style="font-size: 15px; color: #333; line-height: 1.4;">${nextRankContent}</div>
@@ -434,7 +440,7 @@
         // [투표 화면 (강제 지정 모드 분기)]
         if(state.forceNext && state.forceNext.enabled) {
             const nextBean = state.candidates[state.forceNext.beanIndex];
-            document.getElementById('poll-summary').innerHTML = ''; // 요약 숨김
+            document.getElementById('poll-summary').innerHTML = ''; 
             if (nextBean) {
                 document.getElementById('poll-list').innerHTML = `
                     <div style="border: 2px solid #e91e63; padding: 20px; border-radius: 12px; background: #fff5f8;">
