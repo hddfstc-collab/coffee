@@ -61,25 +61,21 @@
         
         .note-badge { display: inline-block; padding: 5px 14px; background: #f0f0f0; border-radius: 20px; font-size: 13px; margin-right: 5px; margin-top: 5px; font-weight: 500; color: #333; }
         .recipe-box { margin: 10px 0; font-size: 15px; line-height: 1.5; color: #222; background: #fafafa; padding: 15px; border-radius: 8px; white-space: pre-line; border-left: 4px solid #ddd; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
 
         /* 세로 모드 메인 레이아웃 기본값 */
-        #section-home { display: flex; flex-direction: column; width: 100%; }
-        #home-right-column { display: flex; flex-direction: column; width: 100%; }
+        .home-wrapper { display: flex; flex-direction: column; width: 100%; }
+        .home-right-column { display: flex; flex-direction: column; width: 100%; }
         
-        /* 💡 핵심: 가로(Landscape) 모드일 때만 적용되는 2분할 반응형 웹 시트 */
+        /* 💡 가로(Landscape) 모드일 때만 1번 홈 탭에 적용되는 반응형 레이아웃 구조 */
         @media (orientation: landscape) {
             .container { max-width: 100%; }
             main { padding-bottom: 75px; }
             
-            /* 메인 화면을 가로 2분할 랩퍼로 변경 */
-            #section-home { display: flex; flex-direction: row; width: 100%; gap: 0; padding: 5px; box-sizing: border-box; align-items: flex-start; }
-            
-            /* 왼쪽 항목: 현재 원두 단독 배치 (가로 너비 50% 차지) */
-            #home-left-bean { flex: 1; width: 50%; }
-            
-            /* 오른쪽 항목: 두 가지 카드(맛 투표 + 현황)를 품는 세로 기둥 (가로 너비 50% 차지) */
-            #home-right-column { flex: 1; width: 50%; display: flex; flex-direction: column; }
+            /* 홈 화면 전용 2분할 랩퍼 */
+            .home-wrapper { display: flex; flex-direction: row; width: 100%; gap: 0; padding: 5px; box-sizing: border-box; align-items: flex-start; }
+            .home-left-bean { flex: 1; width: 50%; }
+            .home-right-column { flex: 1; width: 50%; display: flex; flex-direction: column; }
             
             .card { margin: 10px; }
             .bean-img { max-height: 180px; }
@@ -105,29 +101,31 @@
 
     <main id="content-area">
         <section id="section-home">
-            <div id="home-left-bean">
-                <div class="card">
-                    <h2 id="view-bean-name" style="margin-top:0;">데이터를 불러오는 중...</h2>
-                    <img id="view-bean-img" class="bean-img hidden" onclick="zoomImg(this.src)">
-                    <div id="view-notes" style="margin-bottom: 15px;"></div>
-                    <div id="view-recipe" class="recipe-box hidden" style="border-left-color: var(--primary); background: #e6f4ea; color:#333;"></div>
-                </div>
-            </div>
-            
-            <div id="home-right-column">
-                <div class="card" id="taste-vote-card">
-                    <h3 style="margin-top: 0;">오늘의 커피 맛 평가 ☕</h3>
-                    <div class="vote-info"><span id="good-count">추천 0</span> <span id="bad-count">비추천 0</span></div>
-                    <div class="vote-bar-container"><div id="taste-bar" class="vote-bar-fill" style="background:#ffc107;"></div></div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-outline" id="btn-good" onclick="castTaste('good')">👍 추천</button>
-                        <button class="btn-outline" id="btn-bad" onclick="castTaste('bad')">👎 비추천</button>
+            <div class="home-wrapper">
+                <div class="home-left-bean">
+                    <div class="card">
+                        <h2 id="view-bean-name" style="margin-top:0;">데이터를 불러오는 중...</h2>
+                        <img id="view-bean-img" class="bean-img hidden" onclick="zoomImg(this.src)">
+                        <div id="view-notes" style="margin-bottom: 15px;"></div>
+                        <div id="view-recipe" class="recipe-box hidden" style="border-left-color: var(--primary); background: #e6f4ea; color:#333;"></div>
                     </div>
                 </div>
                 
-                <div class="card" id="live-status-card">
-                    <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px;">🗳️ 다음 원두 투표 현황</h3>
-                    <div id="live-status-content" style="font-size: 15px; color: #333; line-height: 1.4;">집계 중...</div>
+                <div class="home-right-column">
+                    <div class="card" id="taste-vote-card">
+                        <h3 style="margin-top: 0;">오늘의 커피 맛 평가 ☕</h3>
+                        <div class="vote-info"><span id="good-count">추천 0</span> <span id="bad-count">비추천 0</span></div>
+                        <div class="vote-bar-container"><div id="taste-bar" class="vote-bar-fill" style="background:#ffc107;"></div></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-outline" id="btn-good" onclick="castTaste('good')">👍 추천</button>
+                            <button class="btn-outline" id="btn-bad" onclick="castTaste('bad')">👎 비추천</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card" id="live-status-card">
+                        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px;">🗳️ 다음 원두 투표 현황</h3>
+                        <div id="live-status-content" style="font-size: 15px; color: #333; line-height: 1.4;">집계 중...</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -206,7 +204,7 @@
     let tempImgData = "";
     let editingIndex = -1;
     let currentUid = null; 
-    let autoReturnTimer = null; // 자동 복귀 타이머 변수
+    let autoReturnTimer = null; 
     const graphColors = ['#00704A', '#ffc107', '#4285F4', '#ea4335', '#9c27b0', '#00bcd4'];
 
     const defaultState = {
@@ -247,9 +245,8 @@
         if(el) el.classList.add('active');
         document.getElementById('content-area').scrollTop = 0;
 
-        clearTimeout(autoReturnTimer); // 화면 전환 시 기존 타이머 파괴
+        clearTimeout(autoReturnTimer); 
         
-        // 다음원두 투표화면이고 강제 지정 모드가 ON일 때 10초 뒤 홈 화면 복귀 타이머 작동
         if (id === 'poll' && state && state.forceNext && state.forceNext.enabled) {
             autoReturnTimer = setTimeout(() => {
                 const homeTab = document.querySelectorAll('.nav-item')[0];
@@ -364,7 +361,7 @@
         // [홈 화면 - 2. 맛 투표 수치 맵핑]
         const t = state.current.taste; const totalT = t.good + t.bad;
         document.getElementById('good-count').innerText = `추천 ${t.good}`;
-        document.getElementById('bad-count').innerText = `비추chen ${t.bad}`;
+        document.getElementById('bad-count').innerText = `비추천 ${t.bad}`;
         document.getElementById('taste-bar').style.width = totalT > 0 ? (t.good / totalT * 100) + "%" : "50%";
         document.getElementById('btn-good').disabled = isClosed; document.getElementById('btn-bad').disabled = isClosed;
 
@@ -391,15 +388,17 @@
                 }
             }
         }
-        // 현황 카드에 정보 꼽기
+        
+        // 현황 카드에 렌더링
         const statusCard = document.getElementById('live-status-card');
         if(statusCard) {
             statusCard.style.cssText = nextRankStyle;
+            statusCard.style.margin = '15px';
             document.getElementById('live-status-content').innerHTML = nextRankContent;
             statusCard.querySelector('h3').innerText = nextRankTitle;
         }
 
-        // [투표 화면 분기 출력]
+        // [🗳️ 투표 탭 화면 독립출력 - 투표 리스트가 제자리를 찾았습니다]
         if(state.forceNext && state.forceNext.enabled) {
             const nextBean = state.candidates[state.forceNext.beanIndex];
             document.getElementById('poll-summary').innerHTML = ''; 
@@ -445,10 +444,10 @@
                         </div>
                         <button class="btn-vote thumb-btn" onclick="castVote(${i})" ${isClosed ? 'disabled' : ''}>${isClosed ? '마감됨' : '투표'}</button>
                     </div>`;
-            }).join('') || "<div style='padding:20px; text-align:center; color:#999; font-size:14px;'>후보 대기 중</div>";
+            }).join('') || "<div style='padding:20px; text-align:center; color:#999; font-size:14px;'>관리자가 후보를 등록할 때까지 기다려주세요.</div>";
         }
 
-        // [관리자 화면 렌더링 스크립트]
+        // [⚙️ 관리자 화면 렌더링 스크립트]
         const forceEnabled = state.forceNext && state.forceNext.enabled;
         let selectOptions = state.candidates.map((c, i) => `<option value="${i}" ${state.forceNext.beanIndex == i ? 'selected' : ''}>${c.name}</option>`).join('');
         document.getElementById('admin-force-manage').innerHTML = `
