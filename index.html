@@ -379,12 +379,20 @@
             const activeCandidates = state.candidates.filter(c => c.active !== false);
             const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
             if (totalVotes > 0) {
-                let maxVotes = 0; let topCandName = "";
-                activeCandidates.forEach(c => {
-                    if (c.votes > maxVotes) { maxVotes = c.votes; topCandName = c.name; }
-                });
+                // 1. 최고 득표수가 몇 표인지 계산
+                let maxVotes = 0;
+                activeCandidates.forEach(c => { if (c.votes > maxVotes) maxVotes = c.votes; });
+                
                 if (maxVotes > 0) {
-                    nextRankContent = `현재 1위: <strong style="color: var(--primary); font-size: 18px;">🏆 ${topCandName}</strong> (${maxVotes}표)`;
+                    // 2. 최고 득표수와 똑같은 표를 가진 원두들을 배열로 묶기 (동수 처리)
+                    const topCandList = activeCandidates.filter(c => c.votes === maxVotes).map(c => `🏆 ${c.name}`);
+                    
+                    // 3. 동점 여부에 따라 문구 분기
+                    if (topCandList.length > 1) {
+                        nextRankContent = `현재 공동 1위: <strong style="color: #ef6c00; font-size: 15px;">${topCandList.join(', ')}</strong> (${maxVotes}표 동수!)`;
+                    } else {
+                        nextRankContent = `현재 1위: <strong style="color: var(--primary); font-size: 18px;">${topCandList[0]}</strong> (${maxVotes}표)`;
+                    }
                 }
             }
         }
