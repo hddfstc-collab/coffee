@@ -543,7 +543,7 @@
             toggleBtn.innerText = isClosed ? "투표 다시 열기 (잠금 해제)" : "투표 마감하기 (버튼 잠금)";
             toggleBtn.style.background = isClosed ? "#000" : "var(--primary)";
         }
-    }
+    };
 
     window.resetApp = function() { if(confirm("전체 초기화하시겠습니까?")) { state = defaultState; saveToServer("초기화 완료"); } }
 
