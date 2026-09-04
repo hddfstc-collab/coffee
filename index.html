@@ -12,7 +12,17 @@
     <style>
         :root { --primary: #00704A; --bg: #f4f4f2; }
         body { font-family: 'Pretendard', sans-serif; background: #333; margin: 0; padding: 0; display: flex; justify-content: center; }
-        .container { max-width: 500px; width: 100%; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--bg);
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
         
         header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; }
         header h1 { margin: 0; font-size: 20px; font-weight: 600; }
@@ -339,8 +349,7 @@
     }
     window.castVote = function(i) { 
         if(!state) return; state.candidates[i].votes++; saveToServer(); 
-        setTimeout(() => { location.reload(); }, 1500);
-    }
+
 
     window.render = function() {
         if (!state) return;
