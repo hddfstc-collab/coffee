@@ -29,8 +29,16 @@
         
         main { flex: 1; overflow-y: auto; padding-bottom: 90px; -webkit-overflow-scrolling: touch; }
         .card { margin: 15px; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.06); box-sizing: border-box; }
-        .bean-img { width: 100%; height: auto; max-height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #fdfdfd; cursor: zoom-in; }
-
+        .bean-img {
+            width: 100%;
+            display: block;
+            margin-bottom: 12px;
+            max-height: 360px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #fff;
+            cursor: zoom-in;
+        }
         .modal-bean-img { width: 100%; height: auto; max-height: 350px; object-fit: contain; border-radius: 12px; margin-bottom: 12px; background: #f9f9f9; cursor: zoom-in; }
         #img-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; justify-content:center; align-items:center; cursor: zoom-out; }
         #img-modal img { max-width: 95%; max-height: 95%; border-radius: 10px; }
@@ -78,17 +86,44 @@
         .home-right-column { display: flex; flex-direction: column; width: 100%; }
         
         /* 💡 가로(Landscape) 모드일 때만 1번 홈 탭에 적용되는 반응형 레이아웃 구조 */
-        @media (orientation: landscape) {
-            .container { max-width: 100%; }
-            main { padding-bottom: 75px; }
-            
-            /* 홈 화면 전용 2분할 랩퍼 */
-            .home-wrapper { display: flex; flex-direction: row; width: 100%; gap: 0; padding: 5px; box-sizing: border-box; align-items: flex-start; }
-            .home-left-bean { flex: 1; width: 50%; }
-            .home-right-column { flex: 1; width: 50%; display: flex; flex-direction: column; }
-            
-            .card { margin: 10px; }
-            .bean-img { max-height: 180px; }
+        @media (min-width: 900px) {
+        
+            .container {
+                max-width: 1200px;
+            }
+        
+            main {
+                padding-bottom: 75px;
+            }
+        
+            .home-wrapper {
+                display: flex;
+                flex-direction: row;
+                gap: 15px;
+                padding: 10px;
+                box-sizing: border-box;
+                align-items: flex-start;
+            }
+        
+            .home-left-bean {
+                flex: 1.5;
+                width: auto;
+            }
+        
+            .home-right-column {
+                flex: 1;
+                width: auto;
+                display: flex;
+                flex-direction: column;
+            }
+        
+            .card {
+                margin: 10px;
+            }
+        
+            .bean-img {
+                max-height: 420px;
+            }
         }
     </style>
 </head>
@@ -343,17 +378,31 @@
         document.getElementById('admin-recipe').value = ""; document.getElementById('img-selector').value = "";
     }
 
-    window.castTaste = function(type) { 
-        if(!state) return; state.current.taste[type]++; saveToServer(); 
-        setTimeout(() => { const pollTab = document.querySelectorAll('.nav-item')[1]; if (pollTab) pollTab.click(); }, 1200);
+    window.castTaste = async function(type) {
+    
+        if(!state) return;
+    
+        state.current.taste[type]++;
+    
+        document.getElementById('btn-good').disabled = true;
+        document.getElementById('btn-bad').disabled = true;
+    
+        await saveToServer();
     }
-    window.castVote = function(i) { 
-        if(!state) return; state.candidates[i].votes++; saveToServer(); 
-
-
+    window.castVote = async function(i) {
+    
+        if(!state) return;
+    
+        state.candidates[i].votes++;
+    
+        document
+            .querySelectorAll('.thumb-btn')
+            .forEach(btn => btn.disabled = true);
+    
+        await saveToServer();
+    };
+    
     window.render = function() {
-        if (!state) return;
-        const isClosed = state.status === "closed"; 
 
         // [홈 화면 - 1. 현재 사용 원두 데이터 맵핑]
         document.getElementById('view-bean-name').innerText = state.current.name;
