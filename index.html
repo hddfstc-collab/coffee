@@ -403,7 +403,11 @@
     };
     
     window.render = function() {
-
+    
+        if (!state) return;
+    
+        const isClosed = state.status === "closed";
+    
         // [홈 화면 - 1. 현재 사용 원두 데이터 맵핑]
         document.getElementById('view-bean-name').innerText = state.current.name;
         document.getElementById('view-notes').innerHTML = state.current.notes ? state.current.notes.split(',').map(n => `<span class="note-badge">${n.trim()}</span>`).join('') : "";
