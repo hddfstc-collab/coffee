@@ -5,7 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>커피 매니저 · 태블릿 v2026.10.20-r2</title>
+    <title>커피 매니저 · 태블릿 v2026.10.20-r4</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -13,9 +13,22 @@
 :root{--primary:#00704a;--bg:#f3f5f2}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#19362a;font-family:system-ui,'Malgun Gothic',sans-serif}.container{width:100%;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}header{background:var(--primary);color:white;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}header h1{margin:0;font-size:24px}.build{font-size:12px}main{flex:1;min-height:0;overflow:auto;padding:16px}.card{padding:24px;background:white;border:1px solid #e1e8e2;border-radius:20px;margin:0 0 16px;box-shadow:0 4px 18px #163c2210;min-width:0}.home-wrapper{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.home-left-bean,.home-right-column{min-width:0}.home-right-column{display:flex;flex-direction:column}.hero{display:grid;gap:24px;align-items:start}.hero h2{font-size:clamp(26px,3vw,42px);margin:0 0 16px;overflow-wrap:anywhere}.bean-img{width:100%;height:clamp(240px,55vh,620px);object-fit:contain;background:#f8faf7;border-radius:16px;cursor:zoom-in}.note-badge{display:inline-block;padding:8px 16px;margin:4px;background:#edf4ee;border-radius:24px;font-size:18px}.recipe-box{white-space:pre-wrap;overflow-wrap:anywhere;font-size:20px;line-height:1.65;padding:20px;border-left:4px solid var(--primary);background:#eef6ef;border-radius:12px;margin-top:16px}button{font:inherit;font-weight:600;min-height:48px;padding:12px 18px;border:0;border-radius:12px;cursor:pointer;margin:6px 0;width:100%;touch-action:manipulation}button:disabled{opacity:.5;cursor:not-allowed}.btn-main{background:var(--primary);color:white}.btn-outline{background:white;border:1px solid var(--primary);color:var(--primary)}.btn-vote{background:var(--primary);color:white}.nav{display:flex;flex-shrink:0;background:white;border-top:1px solid #dfe7df;padding-bottom:env(safe-area-inset-bottom)}.nav-item{flex:1;text-align:center;padding:20px 6px;font-size:17px;cursor:pointer;min-height:64px}.active{color:var(--primary);font-weight:750;background:#edf6ee}.hidden{display:none!important}.vote-info{display:flex;justify-content:space-between;gap:12px;font-size:17px}.vote-bar-container{height:12px;background:#e9eeea;border-radius:12px;overflow:hidden;margin:12px 0}.vote-bar-fill{height:100%;background:var(--primary);transition:width .2s}.bean-library-grid{display:grid;grid-template-columns:1fr;gap:18px}.bean-library-card{padding:20px;border:1px solid #dfe7df;border-radius:16px;min-width:0;cursor:pointer}.bean-library-img{width:100%;height:clamp(240px,42vh,440px);object-fit:contain;background:#f8faf7;border-radius:12px}.bean-library-name{font-size:26px;margin:14px 0}.bean-library-empty{padding:36px;color:#68776e}.thumb-item{display:grid;grid-template-columns:150px minmax(0,1fr) 100px;gap:20px;align-items:center;border-bottom:1px solid #e5ebe5;padding:20px 0}.thumb-img{width:150px;height:160px;object-fit:contain;cursor:zoom-in}.thumb-name{font-size:24px;overflow-wrap:anywhere}.thumb-info{min-width:0;cursor:pointer}.admin-input{width:100%;padding:14px;border:1px solid #ccd9cf;border-radius:10px;font:inherit;margin:8px 0 16px}.feature-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:16px 0;border-bottom:1px solid #eee}.feature-label strong,.feature-label small{display:block}.feature-label small{color:#68776e;margin-top:6px}.switch{position:relative;width:56px;height:32px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#a5afa8;border-radius:30px;cursor:pointer}.slider:before{content:'';position:absolute;width:26px;height:26px;top:3px;left:3px;border-radius:50%;background:white;transition:transform .2s}.switch input:checked+.slider{background:var(--primary)}.switch input:checked+.slider:before{transform:translateX(24px)}#img-modal,#cand-modal{display:none;position:fixed;inset:0;background:#000c;z-index:90;align-items:center;justify-content:center;padding:24px}#img-modal{z-index:100;cursor:zoom-out}#img-modal img{max-width:96%;max-height:96%;object-fit:contain}.cand-modal-content{position:relative;background:white;border-radius:20px;padding:32px;width:min(1120px,96vw);max-height:90dvh;overflow:auto;display:grid;gap:18px}.cand-close-btn{position:absolute;right:12px;top:8px;width:48px;background:#eaf0eb}.modal-bean-img{width:100%;height:55vh;object-fit:contain;cursor:zoom-in}#cm-name{font-size:30px;padding-right:45px}.connection-row{display:flex;align-items:center;justify-content:space-between;padding:6px 20px;background:#e6f1e8;gap:12px}.connection-row button{width:auto;min-height:32px;font-size:13px;padding:4px 12px;margin:0}#connection{font-size:14px}#connection.error{color:#914600}.stacked-bar{display:flex;height:14px;border-radius:8px;overflow:hidden}.stacked-segment{height:100%}
 @media(min-width:760px) and (orientation:landscape){.home-wrapper{grid-template-columns:minmax(0,1fr) minmax(280px,30%)}.home-wrapper.solo{grid-template-columns:minmax(0,1fr)}.hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hero.no-image{grid-template-columns:1fr}.bean-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bean-library-grid.single{grid-template-columns:1fr}.bean-library-grid.single .bean-library-img{height:60vh}.cand-modal-content{grid-template-columns:1fr 1fr}.cand-modal-content h3{grid-column:1/-1}.modal-bean-img{grid-row:2/4}.cand-modal-content .recipe-box{margin:0}#section-admin{max-width:1400px;margin:auto}}
 @media(max-width:600px){main{padding:10px}.card{padding:18px}.thumb-item{grid-template-columns:80px minmax(0,1fr);gap:12px}.thumb-img{width:80px;height:110px}.thumb-btn{grid-column:1/-1}.nav-item{font-size:13px}.build{font-size:10px}.hero h2{font-size:28px}}
+
+#admin-login-modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;background:#0009;padding:24px}
+.admin-login-box{width:min(440px,100%);padding:28px;background:white;border-radius:20px}
+#admin-login-error{color:#b42318;min-height:24px}
 </style>
 <script>window.addEventListener('error',function(e){if(e.target&&e.target.tagName==='SCRIPT'){const el=document.getElementById('connection');if(el){el.textContent='외부 스크립트 로드 실패 · 네트워크/차단 설정 확인';el.classList.add('error');}}},true);</script></head>
 <body>
+<div id="admin-login-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
+<form class="admin-login-box" onsubmit="window.submitAdminLogin(event)">
+<h2 id="admin-login-title">관리자 로그인</h2>
+<label for="admin-login-password">관리자 비밀번호</label>
+<input id="admin-login-password" type="password" class="admin-input" autocomplete="current-password" required>
+<div id="admin-login-error" role="alert"></div>
+<button type="submit" class="btn-main">설정 화면 열기</button>
+<button type="button" class="btn-outline" onclick="document.getElementById('admin-login-modal').classList.add('hidden')">닫기</button>
+</form></div>
 
 <div id="img-modal" onclick="this.style.display='none'"><img id="modal-img"></div>
 
@@ -30,7 +43,7 @@
 </div>
 
 <div class="container">
-    <header><h1 id="page-title">오늘의 커피</h1><span class="build">태블릿 v2026.10.20-r2</span></header><div class="connection-row"><span id="connection" role="status">서버 연결 확인 중</span><button onclick="window.retryConnection?.()">연결 재시도</button></div>
+    <header><h1 id="page-title">오늘의 커피</h1><span class="build">태블릿 v2026.10.20-r4</span></header><div class="connection-row"><span id="connection" role="status">서버 연결 확인 중</span><button id="retry-connection" class="hidden" onclick="window.retryConnection?.()">연결 재시도</button></div>
 
     <main id="content-area">
         <section id="section-home">
@@ -122,7 +135,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { initializeFirestore, doc, onSnapshot, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -136,9 +149,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = initializeFirestore(app, {
-        experimentalForceLongPolling: true
-    });
+    const db = getFirestore(app);
     const auth = getAuth(app); 
     const docRef = doc(db, "coffeeApp", "sharedData");
 
@@ -171,14 +182,29 @@
     function changed(key,value){const sig=JSON.stringify(value);if(signatures.get(key)===sig)return false;signatures.set(key,sig);return true;}
     let activeTab='home',unsubscribe=null,frame=null,tasteBusy=false,pollBusy=false;
     function normalize(data={}){const d=structuredClone(defaultState),v={...d,...data};v.ui={...d.ui,...data.ui};v.current={...d.current,...data.current};v.current.taste={good:0,bad:0,...v.current.taste};v.candidates=Array.isArray(v.candidates)?v.candidates:[];v.voters={taste:[],poll:[],...v.voters};v.forceNext={...d.forceNext,...v.forceNext};return v;}
-    function connection(message,error=false){text('connection',message);$('connection').classList.toggle('error',error);}
+    function connection(message,error=false){text('connection',message);$('connection').classList.toggle('error',error);$('retry-connection').classList.toggle('hidden',!error);}
     function scheduleRender(){if(frame!==null)return;frame=requestAnimationFrame(()=>{frame=null;window.render();});}
-    function startListener(){if(unsubscribe)unsubscribe();unsubscribe=onSnapshot(docRef,{includeMetadataChanges:true},snap=>{
+    function startListener(){if(unsubscribe)unsubscribe();unsubscribe=onSnapshot(docRef,snap=>{
         if(!snap.exists()){if(snap.metadata.fromCache){connection('서버 응답 확인 중 · 저장된 데이터 없음',true);return;}state=normalize();connection('서버 데이터가 없습니다. 관리자에서 원두를 등록하세요.',true);scheduleRender();return;}
-        state=normalize(snap.data());connection(snap.metadata.fromCache?'임시 저장 데이터 표시 중 · 서버 연결 확인 중':'실시간 연결됨 · 호환 연결 모드');scheduleRender();
+        state=normalize(snap.data());connection(snap.metadata.fromCache?'임시 저장 데이터 표시 중 · 서버 연결 확인 중':'실시간 연결됨 · 원본 연결 방식');scheduleRender();
     },e=>{console.error(e);connection(`연결 실패 (${e.code||'unknown'}) · 권한/네트워크 확인 후 연결 재시도`,true);if(!state)text('view-bean-name','서버에 연결하지 못했습니다.');});}
-    onAuthStateChanged(auth,user=>{if(user){currentUid=user.uid;startListener();}else{currentUid=null;if(unsubscribe){unsubscribe();unsubscribe=null;}signInAnonymously(auth).catch(e=>{connection(`인증 실패 (${e.code}) · 익명 로그인 설정 확인`,true);text('view-bean-name','로그인 연결을 확인해주세요.');});}});
-    window.retryConnection=()=>{connection('연결 재시도 중');if(auth.currentUser)startListener();else signInAnonymously(auth).catch(e=>connection(`인증 실패 (${e.code})`,true));};
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUid = user.uid;
+            if (state) scheduleRender();
+        } else {
+            signInAnonymously(auth).catch(error => {
+                console.error(error);
+                connection(`인증 실패 (${error.code})`, true);
+            });
+        }
+    });
+    startListener();
+    window.retryConnection = () => {
+        connection('연결 재시도 중');
+        startListener();
+        if (!auth.currentUser) signInAnonymously(auth).catch(console.error);
+    };
     setTimeout(()=>{if(!state)connection('서버 응답 지연 · 연결 재시도 또는 네트워크/권한을 확인하세요.',true);},15000);
     async function saveToServer(msg) {
         try { if(new TextEncoder().encode(JSON.stringify(state)).length>900000)throw Error('이미지 포함 데이터가 큽니다. 이미지 크기 또는 후보 수를 줄여주세요.'); await setDoc(docRef, state); if (msg) alert(msg); } 
@@ -197,6 +223,10 @@
         if(el) el.classList.add('active');
         document.getElementById('content-area').scrollTop = 0;
         if(state)window.render();
+        if(id==='admin'&&!state){
+            html('admin-feature-manage','<h3>서버 데이터 연결 대기</h3><p>연결 전에는 기능 설정을 불러올 수 없습니다. 서버 데이터를 덮어쓰지 않도록 저장을 막았습니다.</p>');
+        }
+        document.querySelectorAll('#section-admin button,#section-admin input,#section-admin textarea,#section-admin select').forEach(control=>control.disabled=!state);
 
         clearTimeout(autoReturnTimer); 
         
@@ -208,7 +238,21 @@
         }
     }
 
-    window.adminLogin = function(el) { if(prompt("비밀번호") === "1234") window.navTo('admin', '관리자 설정', el); }
+    window.adminLogin = function() {
+        document.getElementById('admin-login-modal').classList.remove('hidden');
+        document.getElementById('admin-login-password').value = '';
+        document.getElementById('admin-login-error').textContent = '';
+        document.getElementById('admin-login-password').focus();
+    };
+    window.submitAdminLogin = function(event) {
+        event.preventDefault();
+        if (document.getElementById('admin-login-password').value !== '1234') {
+            document.getElementById('admin-login-error').textContent = '비밀번호를 확인해주세요.';
+            return;
+        }
+        document.getElementById('admin-login-modal').classList.add('hidden');
+        window.navTo('admin', '관리자 설정', document.getElementById('nav-admin'));
+    };
     window.zoomImg = function(src) { document.getElementById('modal-img').src = src; document.getElementById('img-modal').style.display = 'flex'; }
     
     window.previewImg = function(input) {
@@ -320,6 +364,7 @@
             if(!forced)state.candidates.forEach((c,i)=>{if(!$('votes-'+i))return;const pct=total?Math.round((Number(c.votes)||0)/total*100):0;text('votes-'+i,`${c.votes||0}표`);text('pct-'+i,pct+'%');$('bar-'+i).style.width=pct+'%';});
             document.querySelectorAll('.thumb-btn').forEach(btn=>{btn.disabled=isClosed||pollBusy||!currentUid;const label=isClosed?'마감됨':pollBusy?'저장 중':'투표';if(btn.textContent!==label)btn.textContent=label;});
         }
+        if(activeTab==='admin')document.querySelectorAll('#section-admin button,#section-admin input,#section-admin textarea,#section-admin select').forEach(control=>control.disabled=false);
         if(activeTab==='admin'&&changed('admin',[ui,state.forceNext,state.candidates.map(c=>[c.name,c.active]),state.status]))renderAdmin();
     };
     function renderAdmin(){const ui=state.ui,isClosed=state.status==='closed';
