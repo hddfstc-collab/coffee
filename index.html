@@ -5,142 +5,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>커피 매니저</title>
+    <title>커피 매니저 · 태블릿 v2026.10.20-r1</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        :root { --primary: #00704A; --bg: #f4f4f2; }
-        body { font-family: 'Pretendard', sans-serif; background: #333; margin: 0; padding: 0; display: flex; justify-content: center; }
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            background: var(--bg);
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            margin: 0 auto;
-        }
-        
-        header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; }
-        header h1 { margin: 0; font-size: 20px; font-weight: 600; }
-        
-        main { flex: 1; overflow-y: auto; padding-bottom: 90px; -webkit-overflow-scrolling: touch; }
-        .card { margin: 15px; padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.06); box-sizing: border-box; }
-        .bean-img {
-            width: 100%;
-            display: block;
-            margin-bottom: 12px;
-            max-height: 360px;
-            object-fit: contain;
-            border-radius: 12px;
-            background: #fff;
-            cursor: zoom-in;
-        }
-        .modal-bean-img { width: 100%; height: auto; max-height: 350px; object-fit: contain; border-radius: 12px; margin-bottom: 12px; background: #f9f9f9; cursor: zoom-in; }
-        #img-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; justify-content:center; align-items:center; cursor: zoom-out; }
-        #img-modal img { max-width: 95%; max-height: 95%; border-radius: 10px; }
-
-        #cand-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:90; justify-content:center; align-items:center; padding: 20px; box-sizing: border-box; }
-        .cand-modal-content { background: white; padding: 25px 20px; border-radius: 16px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .cand-close-btn { position: absolute; top: 15px; right: 15px; background: #eee; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; color: #555; }
-
-        /* 투표 목록 스타일 */
-        .thumb-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; gap: 12px; }
-        .thumb-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; cursor: pointer; flex-shrink: 0; background: #fafafa; border: 1px solid #f0f0f0; }
-        .thumb-info { flex: 1; overflow: hidden; cursor: pointer; }
-        .thumb-name { font-weight: 600; font-size: 15px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .thumb-btn { width: 65px; padding: 10px 0; margin: 0; font-size: 13px; flex-shrink: 0; border-radius: 8px; }
-        .thumb-btn:disabled { background: #ccc !important; cursor: not-allowed; }
-
-        /* 게이지바 */
-        .vote-bar-container { background: #eee; border-radius: 10px; height: 12px; width: 100%; margin: 10px 0; overflow: hidden; }
-        .vote-bar-fill { background: var(--primary); height: 100%; transition: width 0.5s; width: 0%; }
-        .vote-info { display: flex; justify-content: space-between; font-size: 13px; color: #666; font-weight: bold; }
-
-        .stacked-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; }
-        .stacked-segment { transition: width 0.5s; height: 100%; }
-
-        button { width: 100%; padding: 14px; margin: 8px 0; border: none; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; }
-        button:disabled { background: #ccc !important; cursor: not-allowed; border-color: #ccc !important; color: #666 !important; }
-        .btn-main { background: var(--primary); color: white; }
-        .btn-outline { background: #fff; border: 1.5px solid var(--primary); color: var(--primary); }
-        .btn-vote { background: #000; color: #fff; }
-        
-        .admin-input { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        
-        /* 하단 네비게이션 */
-        .nav { position: absolute; bottom: 0; width: 100%; display: flex; background: white; border-top: 1px solid #eee; height: 75px; align-items: center; z-index: 10; }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; font-size: 12px; color: #888; }
-        .active { color: var(--primary); font-weight: bold; }
-        
-        .note-badge { display: inline-block; padding: 5px 14px; background: #f0f0f0; border-radius: 20px; font-size: 13px; margin-right: 5px; margin-top: 5px; font-weight: 500; color: #333; }
-        .recipe-box { margin: 10px 0; font-size: 15px; line-height: 1.5; color: #222; background: #fafafa; padding: 15px; border-radius: 8px; white-space: pre-line; border-left: 4px solid #ddd; }
-        .hidden { display: none !important; }
-        .bean-library-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-        .bean-library-card { border:1px solid #eee; border-radius:14px; padding:15px; background:#fff; cursor:pointer; }
-        .bean-library-img { width:100%; height:180px; object-fit:contain; border-radius:10px; background:#fafafa; margin-bottom:10px; }
-        .bean-library-name { margin:0 0 8px; font-size:17px; }
-        .bean-library-empty { padding:30px 10px; text-align:center; color:#888; }
-        .feature-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 0; border-bottom:1px solid #eee; }
-        .feature-row:last-child { border-bottom:none; }
-        .feature-label strong { display:block; font-size:15px; }
-        .feature-label small { display:block; margin-top:4px; color:#777; line-height:1.35; }
-        .switch { position:relative; width:52px; height:30px; flex-shrink:0; }
-        .switch input { opacity:0; width:0; height:0; }
-        .slider { position:absolute; inset:0; cursor:pointer; background:#bbb; border-radius:30px; transition:.2s; }
-        .slider:before { content:''; position:absolute; width:24px; height:24px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 4px rgba(0,0,0,.25); }
-        .switch input:checked + .slider { background:var(--primary); }
-        .switch input:checked + .slider:before { transform:translateX(22px); }
-
-        /* 세로 모드 메인 레이아웃 기본값 */
-        .home-wrapper { display: flex; flex-direction: column; width: 100%; }
-        .home-right-column { display: flex; flex-direction: column; width: 100%; }
-        
-        /* 💡 가로(Landscape) 모드일 때만 1번 홈 탭에 적용되는 반응형 레이아웃 구조 */
-        @media (min-width: 900px) {
-        
-            .container {
-                max-width: 1200px;
-            }
-        
-            main {
-                padding-bottom: 75px;
-            }
-        
-            .home-wrapper {
-                display: flex;
-                flex-direction: row;
-                gap: 15px;
-                padding: 10px;
-                box-sizing: border-box;
-                align-items: flex-start;
-            }
-        
-            .home-left-bean {
-                flex: 1.5;
-                width: auto;
-            }
-        
-            .home-right-column {
-                flex: 1;
-                width: auto;
-                display: flex;
-                flex-direction: column;
-            }
-        
-            .card {
-                margin: 10px;
-            }
-        
-            .bean-img { max-height:420px; }
-            .bean-library-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
-        }
-    </style>
-</head>
+:root{--primary:#00704a;--bg:#f3f5f2}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#19362a;font-family:system-ui,'Malgun Gothic',sans-serif}.container{width:100%;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}header{background:var(--primary);color:white;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}header h1{margin:0;font-size:24px}.build{font-size:12px}main{flex:1;min-height:0;overflow:auto;padding:16px}.card{padding:24px;background:white;border:1px solid #e1e8e2;border-radius:20px;margin:0 0 16px;box-shadow:0 4px 18px #163c2210;min-width:0}.home-wrapper{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.home-left-bean,.home-right-column{min-width:0}.home-right-column{display:flex;flex-direction:column}.hero{display:grid;gap:24px;align-items:start}.hero h2{font-size:clamp(26px,3vw,42px);margin:0 0 16px;overflow-wrap:anywhere}.bean-img{width:100%;height:clamp(240px,55vh,620px);object-fit:contain;background:#f8faf7;border-radius:16px;cursor:zoom-in}.note-badge{display:inline-block;padding:8px 16px;margin:4px;background:#edf4ee;border-radius:24px;font-size:18px}.recipe-box{white-space:pre-wrap;overflow-wrap:anywhere;font-size:20px;line-height:1.65;padding:20px;border-left:4px solid var(--primary);background:#eef6ef;border-radius:12px;margin-top:16px}button{font:inherit;font-weight:600;min-height:48px;padding:12px 18px;border:0;border-radius:12px;cursor:pointer;margin:6px 0;width:100%;touch-action:manipulation}button:disabled{opacity:.5;cursor:not-allowed}.btn-main{background:var(--primary);color:white}.btn-outline{background:white;border:1px solid var(--primary);color:var(--primary)}.btn-vote{background:var(--primary);color:white}.nav{display:flex;flex-shrink:0;background:white;border-top:1px solid #dfe7df;padding-bottom:env(safe-area-inset-bottom)}.nav-item{flex:1;text-align:center;padding:20px 6px;font-size:17px;cursor:pointer;min-height:64px}.active{color:var(--primary);font-weight:750;background:#edf6ee}.hidden{display:none!important}.vote-info{display:flex;justify-content:space-between;gap:12px;font-size:17px}.vote-bar-container{height:12px;background:#e9eeea;border-radius:12px;overflow:hidden;margin:12px 0}.vote-bar-fill{height:100%;background:var(--primary);transition:width .2s}.bean-library-grid{display:grid;grid-template-columns:1fr;gap:18px}.bean-library-card{padding:20px;border:1px solid #dfe7df;border-radius:16px;min-width:0;cursor:pointer}.bean-library-img{width:100%;height:clamp(240px,42vh,440px);object-fit:contain;background:#f8faf7;border-radius:12px}.bean-library-name{font-size:26px;margin:14px 0}.bean-library-empty{padding:36px;color:#68776e}.thumb-item{display:grid;grid-template-columns:150px minmax(0,1fr) 100px;gap:20px;align-items:center;border-bottom:1px solid #e5ebe5;padding:20px 0}.thumb-img{width:150px;height:160px;object-fit:contain;cursor:zoom-in}.thumb-name{font-size:24px;overflow-wrap:anywhere}.thumb-info{min-width:0;cursor:pointer}.admin-input{width:100%;padding:14px;border:1px solid #ccd9cf;border-radius:10px;font:inherit;margin:8px 0 16px}.feature-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:16px 0;border-bottom:1px solid #eee}.feature-label strong,.feature-label small{display:block}.feature-label small{color:#68776e;margin-top:6px}.switch{position:relative;width:56px;height:32px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#a5afa8;border-radius:30px;cursor:pointer}.slider:before{content:'';position:absolute;width:26px;height:26px;top:3px;left:3px;border-radius:50%;background:white;transition:transform .2s}.switch input:checked+.slider{background:var(--primary)}.switch input:checked+.slider:before{transform:translateX(24px)}#img-modal,#cand-modal{display:none;position:fixed;inset:0;background:#000c;z-index:90;align-items:center;justify-content:center;padding:24px}#img-modal{z-index:100;cursor:zoom-out}#img-modal img{max-width:96%;max-height:96%;object-fit:contain}.cand-modal-content{position:relative;background:white;border-radius:20px;padding:32px;width:min(1120px,96vw);max-height:90dvh;overflow:auto;display:grid;gap:18px}.cand-close-btn{position:absolute;right:12px;top:8px;width:48px;background:#eaf0eb}.modal-bean-img{width:100%;height:55vh;object-fit:contain;cursor:zoom-in}#cm-name{font-size:30px;padding-right:45px}.connection-row{display:flex;align-items:center;justify-content:space-between;padding:6px 20px;background:#e6f1e8;gap:12px}.connection-row button{width:auto;min-height:32px;font-size:13px;padding:4px 12px;margin:0}#connection{font-size:14px}#connection.error{color:#914600}.stacked-bar{display:flex;height:14px;border-radius:8px;overflow:hidden}.stacked-segment{height:100%}
+@media(min-width:760px) and (orientation:landscape){.home-wrapper{grid-template-columns:minmax(0,1fr) minmax(280px,30%)}.home-wrapper.solo{grid-template-columns:minmax(0,1fr)}.hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hero.no-image{grid-template-columns:1fr}.bean-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bean-library-grid.single{grid-template-columns:1fr}.bean-library-grid.single .bean-library-img{height:60vh}.cand-modal-content{grid-template-columns:1fr 1fr}.cand-modal-content h3{grid-column:1/-1}.modal-bean-img{grid-row:2/4}.cand-modal-content .recipe-box{margin:0}#section-admin{max-width:1400px;margin:auto}}
+@media(max-width:600px){main{padding:10px}.card{padding:18px}.thumb-item{grid-template-columns:80px minmax(0,1fr);gap:12px}.thumb-img{width:80px;height:110px}.thumb-btn{grid-column:1/-1}.nav-item{font-size:13px}.build{font-size:10px}.hero h2{font-size:28px}}
+</style>
+<script>window.addEventListener('error',function(e){if(e.target&&e.target.tagName==='SCRIPT'){const el=document.getElementById('connection');if(el){el.textContent='외부 스크립트 로드 실패 · 네트워크/차단 설정 확인';el.classList.add('error');}}},true);</script></head>
 <body>
 
 <div id="img-modal" onclick="this.style.display='none'"><img id="modal-img"></div>
@@ -156,17 +30,14 @@
 </div>
 
 <div class="container">
-    <header><h1 id="page-title">오늘의 커피</h1></header>
+    <header><h1 id="page-title">오늘의 커피</h1><span class="build">태블릿 v2026.10.20-r1</span></header><div class="connection-row"><span id="connection" role="status">서버 연결 확인 중</span><button onclick="window.retryConnection?.()">연결 재시도</button></div>
 
     <main id="content-area">
         <section id="section-home">
             <div class="home-wrapper">
                 <div class="home-left-bean">
                     <div class="card">
-                        <h2 id="view-bean-name" style="margin-top:0;">데이터를 불러오는 중...</h2>
-                        <img id="view-bean-img" class="bean-img hidden" onclick="zoomImg(this.src)">
-                        <div id="view-notes" style="margin-bottom: 15px;"></div>
-                        <div id="view-recipe" class="recipe-box hidden" style="border-left-color: var(--primary); background: #e6f4ea; color:#333;"></div>
+                        <div class="hero" id="bean-hero"><img id="view-bean-img" class="bean-img hidden" alt="현재 원두" onclick="zoomImg(this.src)"><div><h2 id="view-bean-name">서버 연결 확인 중</h2><div id="view-notes"></div><div id="view-recipe" class="recipe-box hidden"></div></div></div>
                     </div>
                 </div>
                 
@@ -251,7 +122,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -274,7 +145,7 @@
     let editingIndex = -1;
     let currentUid = null; 
     let autoReturnTimer = null;
-    let renderDebounceTimer = null;
+
     const graphColors = ['#00704A', '#ffc107', '#4285F4', '#ea4335', '#9c27b0', '#00bcd4'];
 
     const defaultState = {
@@ -287,34 +158,34 @@
         forceNext: { enabled: false, beanIndex: 0 }
     };
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) { currentUid = user.uid; if(state) window.render(); } 
-        else { signInAnonymously(auth).catch(console.error); }
-    });
 
-    onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-            state = docSnap.data();
-            if(!state.voters) state.voters = { taste: [], poll: [] };
-            if(!state.archive) state.archive = []; 
-            if(!state.status) state.status = "open"; 
-            if(!state.forceNext) state.forceNext = { enabled:false, beanIndex:0 };
-            if(!state.ui) state.ui = { enableTasteVote:true, enablePoll:true, enableInfoMode:true, autoReturnPoll:true };
-            if(typeof state.ui.enableTasteVote !== 'boolean') state.ui.enableTasteVote = true;
-            if(typeof state.ui.enablePoll !== 'boolean') state.ui.enablePoll = true;
-            if(typeof state.ui.enableInfoMode !== 'boolean') state.ui.enableInfoMode = true;
-            if(typeof state.ui.autoReturnPoll !== 'boolean') state.ui.autoReturnPoll = true;
-            clearTimeout(renderDebounceTimer);
-            renderDebounceTimer = setTimeout(() => window.render(), 180);
-        }
-    }, (error) => { console.error("서버 연결 에러:", error); });
-
+    const $=id=>document.getElementById(id);
+    const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const safeImg=value=>/^(data:image\/(png|jpeg|jpg|webp|gif);base64,|https?:\/\/)/i.test(value||'')?value:'';
+    const noteHTML=value=>String(value||'').split(',').filter(n=>n.trim()).map(n=>`<span class="note-badge">${esc(n.trim())}</span>`).join('');
+    const text=(id,value)=>{const el=$(id);if(el.textContent!==String(value))el.textContent=String(value);};
+    const html=(id,value)=>{const el=$(id);if(el._html!==value){el.innerHTML=value;el._html=value;}};
+    const signatures=new Map();
+    function changed(key,value){const sig=JSON.stringify(value);if(signatures.get(key)===sig)return false;signatures.set(key,sig);return true;}
+    let activeTab='home',unsubscribe=null,frame=null,tasteBusy=false,pollBusy=false;
+    function normalize(data={}){const d=structuredClone(defaultState),v={...d,...data};v.ui={...d.ui,...data.ui};v.current={...d.current,...data.current};v.current.taste={good:0,bad:0,...v.current.taste};v.candidates=Array.isArray(v.candidates)?v.candidates:[];v.voters={taste:[],poll:[],...v.voters};v.forceNext={...d.forceNext,...v.forceNext};return v;}
+    function connection(message,error=false){text('connection',message);$('connection').classList.toggle('error',error);}
+    function scheduleRender(){if(frame!==null)return;frame=requestAnimationFrame(()=>{frame=null;window.render();});}
+    function startListener(){if(unsubscribe)unsubscribe();unsubscribe=onSnapshot(docRef,{includeMetadataChanges:true},snap=>{
+        if(!snap.exists()){if(snap.metadata.fromCache){connection('서버 응답 확인 중 · 저장된 데이터 없음',true);return;}state=normalize();connection('서버 데이터가 없습니다. 관리자에서 원두를 등록하세요.',true);scheduleRender();return;}
+        state=normalize(snap.data());connection(snap.metadata.fromCache?'임시 저장 데이터 표시 중 · 서버 연결 확인 중':'실시간 연결됨 · 변경 영역만 갱신');scheduleRender();
+    },e=>{console.error(e);connection(`연결 실패 (${e.code||'unknown'}) · 권한/네트워크 확인 후 연결 재시도`,true);if(!state)text('view-bean-name','서버에 연결하지 못했습니다.');});}
+    onAuthStateChanged(auth,user=>{if(user){currentUid=user.uid;startListener();}else{currentUid=null;if(unsubscribe){unsubscribe();unsubscribe=null;}signInAnonymously(auth).catch(e=>{connection(`인증 실패 (${e.code}) · 익명 로그인 설정 확인`,true);text('view-bean-name','로그인 연결을 확인해주세요.');});}});
+    window.retryConnection=()=>{connection('연결 재시도 중');if(auth.currentUser)startListener();else signInAnonymously(auth).catch(e=>connection(`인증 실패 (${e.code})`,true));};
+    setTimeout(()=>{if(!state)connection('서버 응답 지연 · 연결 재시도 또는 네트워크/권한을 확인하세요.',true);},15000);
     async function saveToServer(msg) {
-        try { await setDoc(docRef, state); if (msg) alert(msg); } 
-        catch (e) { alert("서버 저장 실패!"); }
+        try { if(new TextEncoder().encode(JSON.stringify(state)).length>900000)throw Error('이미지 포함 데이터가 큽니다. 이미지 크기 또는 후보 수를 줄여주세요.'); await setDoc(docRef, state); if (msg) alert(msg); } 
+        catch (e) { alert("서버 저장 실패: "+e.message); window.retryConnection(); }
     }
 
     window.navTo = function(id, title, el) {
+        if(state&&((id==='poll'&&!state.ui.enablePoll)||(id==='info'&&!state.ui.enableInfoMode)))return;
+        activeTab=id;
         const targetSection = document.getElementById('section-' + id);
         if(!targetSection) return;
         document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
@@ -323,6 +194,7 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         if(el) el.classList.add('active');
         document.getElementById('content-area').scrollTop = 0;
+        if(state)window.render();
 
         clearTimeout(autoReturnTimer); 
         
@@ -344,26 +216,19 @@
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                const MAX_SIZE = 400; let width = img.width; let height = img.height;
+                const MAX_SIZE = 1200; let width = img.width; let height = img.height;
                 if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } 
                 else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
                 canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
-                tempImgData = canvas.toDataURL('image/jpeg', 0.7);
+                tempImgData = canvas.toDataURL('image/jpeg', 0.78);
             }
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
 
-    window.openCandModal = function(i) {
-        const c = state.candidates[i]; document.getElementById('cm-name').innerText = c.name;
-        const imgEl = document.getElementById('cm-img');
-        if(c.img) { imgEl.src = c.img; imgEl.classList.remove('hidden'); } else { imgEl.classList.add('hidden'); }
-        document.getElementById('cm-notes').innerHTML = c.notes ? c.notes.split(',').map(n => `<span class="note-badge">${n.trim()}</span>`).join('') : "";
-        const recipeEl = document.getElementById('cm-recipe');
-        if(c.recipe) { recipeEl.innerText = c.recipe; recipeEl.classList.remove('hidden'); } else { recipeEl.classList.add('hidden'); }
-        document.getElementById('cand-modal').style.display = 'flex';
-    }
+
+    window.openCandModal=function(i){const c=state?.candidates[i];if(!c)return;text('cm-name',c.name);html('cm-notes',noteHTML(c.notes));text('cm-recipe',c.recipe||'');$('cm-recipe').classList.toggle('hidden',!c.recipe);const src=safeImg(c.img);if(src&&$('cm-img').getAttribute('src')!==src)$('cm-img').src=src;$('cm-img').classList.toggle('hidden',!src);$('cand-modal').style.display='flex';};
     window.closeCandModal = function() { document.getElementById('cand-modal').style.display = 'none'; }
 
     window.updateCurrent = function() {
@@ -412,163 +277,50 @@
         document.getElementById('admin-recipe').value = ""; document.getElementById('img-selector').value = "";
     }
 
-    window.castTaste = async function(type) {
-    
-        if(!state) return;
-    
-        state.current.taste[type]++;
-    
-        document.getElementById('btn-good').disabled = true;
-        document.getElementById('btn-bad').disabled = true;
-    
-        await saveToServer();
+
+    async function submitVote(kind,value){
+        if(!state||!currentUid||(kind==='taste'?tasteBusy:pollBusy))return;
+        const expected=kind==='taste'?JSON.stringify([state.current.name,state.current.img]):JSON.stringify(state.candidates.map(c=>[c.name,c.img,c.active]));
+        if(kind==='taste')tasteBusy=true;else pollBusy=true;window.render();
+        try{await runTransaction(db,async tx=>{
+            const snap=await tx.get(docRef);if(!snap.exists())throw Error('서버 데이터가 없습니다.');const latest=normalize(snap.data());
+            if(latest.status==='closed'||!latest.ui[kind==='taste'?'enableTasteVote':'enablePoll'])throw Error('투표가 꺼져 있거나 마감되었습니다.');
+            if(kind==='taste'){if(!['good','bad'].includes(value)||JSON.stringify([latest.current.name,latest.current.img])!==expected)throw Error('원두가 변경되었습니다. 다시 확인해주세요.');tx.update(docRef,{['current.taste.'+value]:(Number(latest.current.taste[value])||0)+1});}
+            else{if(latest.forceNext.enabled||JSON.stringify(latest.candidates.map(c=>[c.name,c.img,c.active]))!==expected||!latest.candidates[value]||latest.candidates[value].active===false)throw Error('후보가 변경되었습니다. 다시 확인해주세요.');latest.candidates[value].votes=(Number(latest.candidates[value].votes)||0)+1;tx.update(docRef,{candidates:latest.candidates});}
+        });}catch(e){alert('투표 저장 실패: '+e.message);}finally{if(kind==='taste')tasteBusy=false;else pollBusy=false;window.render();}
     }
-    window.castVote = async function(i) {
-    
-        if(!state) return;
-    
-        state.candidates[i].votes++;
-    
-        document
-            .querySelectorAll('.thumb-btn')
-            .forEach(btn => btn.disabled = true);
-    
-        await saveToServer();
-    };
-    
-    window.render = function() {
-    
-        if (!state) return;
-    
-        const isClosed = state.status === "closed";
-        const ui = state.ui || { enableTasteVote:true, enablePoll:true, enableInfoMode:true, autoReturnPoll:true };
-        const tasteCard=document.getElementById('taste-vote-card');
-        const statusCardEl=document.getElementById('live-status-card');
-        const navInfo=document.getElementById('nav-info');
-        const navPoll=document.getElementById('nav-poll');
-        if(tasteCard) tasteCard.classList.toggle('hidden',!ui.enableTasteVote);
-        if(statusCardEl) statusCardEl.classList.toggle('hidden',!ui.enablePoll);
-        if(navInfo) navInfo.classList.toggle('hidden',!ui.enableInfoMode);
-        if(navPoll) navPoll.classList.toggle('hidden',!ui.enablePoll);
-        const beanLibrary=document.getElementById('bean-library');
-        if(beanLibrary){
-            beanLibrary.innerHTML=state.candidates.map((c,i)=>{
-                if(c.active===false) return '';
-                const notes=c.notes?c.notes.split(',').filter(n=>n.trim()).map(n=>`<span class="note-badge">${n.trim()}</span>`).join(''):'<span style="font-size:13px;color:#999;">테이스팅 노트 없음</span>';
-                return `<div class="bean-library-card" onclick="openCandModal(${i})">${c.img?`<img src="${c.img}" class="bean-library-img" alt="원두 이미지">`:''}<h4 class="bean-library-name">${c.name}</h4><div>${notes}</div>${c.recipe?'<div style="margin-top:10px;font-size:12px;color:#777;">레시피 정보 있음</div>':''}</div>`;
-            }).join('')||'<div class="bean-library-empty">등록된 원두 정보가 없습니다.</div>';
+    window.castTaste=type=>submitVote('taste',type);window.castVote=i=>submitVote('poll',i);
+    window.render=function(){
+        if(!state)return;const ui=state.ui,isClosed=state.status==='closed';
+        $('taste-vote-card').classList.toggle('hidden',!ui.enableTasteVote);$('live-status-card').classList.toggle('hidden',!ui.enablePoll);
+        $('nav-info').classList.toggle('hidden',!ui.enableInfoMode);$('nav-poll').classList.toggle('hidden',!ui.enablePoll);
+        const solo=!ui.enableTasteVote&&!ui.enablePoll;document.querySelector('.home-wrapper').classList.toggle('solo',solo);document.querySelector('.home-right-column').classList.toggle('hidden',solo);
+        if((activeTab==='poll'&&!ui.enablePoll)||(activeTab==='info'&&!ui.enableInfoMode)){window.navTo('home','현재 원두',$('nav-home'));return;}
+        if(activeTab==='home'){
+            const c=state.current;
+            if(changed('current',[c.name,c.img,c.notes,c.recipe])){text('view-bean-name',c.name);html('view-notes',noteHTML(c.notes));text('view-recipe',c.recipe||'');$('view-recipe').classList.toggle('hidden',!c.recipe);const src=safeImg(c.img),img=$('view-bean-img');if(src&&img.getAttribute('src')!==src)img.src=src;img.classList.toggle('hidden',!src);$('bean-hero').classList.toggle('no-image',!src);}
+            text('good-count',`추천 ${c.taste.good}`);text('bad-count',`비추천 ${c.taste.bad}`);const total=Number(c.taste.good)+Number(c.taste.bad);$('taste-bar').style.width=(total?c.taste.good/total*100:50)+'%';$('btn-good').disabled=$('btn-bad').disabled=isClosed||tasteBusy||!currentUid;
+            const next=state.candidates[state.forceNext.beanIndex];let status='아직 투표 내역이 없습니다.';
+            if(state.forceNext.enabled)status=next?`다음 원두 확정: ${next.name}`:'확정된 원두 정보가 없습니다.';
+            else{const list=state.candidates.filter(c=>c.active!==false),max=Math.max(0,...list.map(c=>Number(c.votes)||0));if(max)status=`${list.filter(c=>Number(c.votes)===max).map(c=>c.name).join(' / ')} · ${max}표 (현재 1위)`;}
+            text('live-status-content',status);$('live-status-card').querySelector('h3').textContent=state.forceNext.enabled?'다음 원두 확정':'다음 원두 투표 현황';
         }
-    
-        // [홈 화면 - 1. 현재 사용 원두 데이터 맵핑]
-        document.getElementById('view-bean-name').innerText = state.current.name;
-        document.getElementById('view-notes').innerHTML = state.current.notes ? state.current.notes.split(',').map(n => `<span class="note-badge">${n.trim()}</span>`).join('') : "";
-        
-        const recipeView = document.getElementById('view-recipe');
-        if (state.current.recipe) { recipeView.innerText = state.current.recipe; recipeView.classList.remove('hidden'); }
-        else { recipeView.classList.add('hidden'); }
-
-        const mainImg = document.getElementById('view-bean-img');
-        if(state.current.img) { mainImg.src = state.current.img; mainImg.classList.remove('hidden'); }
-        else { mainImg.classList.add('hidden'); }
-        
-        // [홈 화면 - 2. 맛 투표 수치 맵핑]
-        const t = state.current.taste; const totalT = t.good + t.bad;
-        document.getElementById('good-count').innerText = `추천 ${t.good}`;
-        document.getElementById('bad-count').innerText = `비추천 ${t.bad}`;
-        document.getElementById('taste-bar').style.width = totalT > 0 ? (t.good / totalT * 100) + "%" : "50%";
-        document.getElementById('btn-good').disabled = isClosed; document.getElementById('btn-bad').disabled = isClosed;
-
-        // [홈 화면 - 3. 실시간 다음 원두 대형 현황판 연산]
-        let nextRankTitle = "🗳️ 다음 원두 투표 현황";
-        let nextRankContent = "아직 투표 내역이 없습니다.";
-        let nextRankStyle = "background: #fff; border: 1px solid #eee;";
-
-        if (state.forceNext && state.forceNext.enabled) {
-            const fx = state.candidates[state.forceNext.beanIndex];
-            nextRankTitle = "📢 다음 원두 확정";
-            nextRankContent = fx ? `다음 원두는 <strong style="color: #e91e63; font-size:17px;">${fx.name}</strong>(으)로 진행하겠습니다.` : "확정된 원두 정보가 없습니다.";
-            nextRankStyle = "background: #fff5f8; border: 1.5px solid #e91e63;"; 
-        } else {
-            const activeCandidates = state.candidates.filter(c => c.active !== false);
-            const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
-            if (totalVotes > 0) {
-                // 1. 최고 득표수가 몇 표인지 계산
-                let maxVotes = 0;
-                activeCandidates.forEach(c => { if (c.votes > maxVotes) maxVotes = c.votes; });
-                
-                if (maxVotes > 0) {
-                    // 2. 최고 득표수와 똑같은 표를 가진 원두들을 배열로 묶기 (동수 처리)
-                    const topCandList = activeCandidates.filter(c => c.votes === maxVotes).map(c => `🏆 ${c.name}`);
-                    
-                    // 3. 동점 여부에 따라 문구 분기
-                    if (topCandList.length > 1) {
-                        nextRankContent = `현재 공동 1위: <strong style="color: #ef6c00; font-size: 15px;">${topCandList.join(', ')}</strong> (${maxVotes}표 동수!)`;
-                    } else {
-                        nextRankContent = `현재 1위: <strong style="color: var(--primary); font-size: 18px;">${topCandList[0]}</strong> (${maxVotes}표)`;
-                    }
-                }
+        if(activeTab==='info'&&changed('library',state.candidates.map(c=>[c.name,c.img,c.notes,c.recipe,c.active]))){
+            const list=state.candidates.map((c,i)=>({c,i})).filter(({c})=>c.active!==false);$('bean-library').classList.toggle('single',list.length===1);
+            html('bean-library',list.map(({c,i})=>`<article class="bean-library-card" tabindex="0" role="button" onclick="openCandModal(${i})" onkeydown="if(event.key==='Enter')openCandModal(${i})">${safeImg(c.img)?`<img loading="lazy" decoding="async" src="${esc(safeImg(c.img))}" class="bean-library-img" alt="${esc(c.name)}">`:''}<h4 class="bean-library-name">${esc(c.name)}</h4>${noteHTML(c.notes)}${c.recipe?`<div class="recipe-box">${esc(c.recipe)}</div>`:''}</article>`).join('')||'<div class="bean-library-empty">등록된 원두 정보가 없습니다.</div>');
+        }
+        if(activeTab==='poll'){
+            const forced=state.forceNext.enabled,next=state.candidates[state.forceNext.beanIndex];
+            if(changed('poll-structure',[state.candidates.map(c=>[c.name,c.img,c.active,c.notes,c.recipe]),state.forceNext])){
+                html('poll-list',forced?(next?`<h2>다음 원두 확정: ${esc(next.name)}</h2>${safeImg(next.img)?`<img class="bean-img" src="${esc(safeImg(next.img))}" onclick="zoomImg(this.src)" alt="다음 원두">`:''}${noteHTML(next.notes)}<div class="recipe-box">${esc(next.recipe)}</div><button class="btn-main" onclick="navTo('home','현재 원두',document.getElementById('nav-home'))">현재 원두로 돌아가기</button>`:'확정된 원두 정보가 없습니다.'):state.candidates.map((c,i)=>c.active===false?'':`<div class="thumb-item">${safeImg(c.img)?`<img class="thumb-img" src="${esc(safeImg(c.img))}" alt="${esc(c.name)}" onclick="openCandModal(${i})">`:'<div>이미지 없음</div>'}<div class="thumb-info" onclick="openCandModal(${i})"><div class="thumb-name">${esc(c.name)}</div><div class="vote-info"><span id="votes-${i}"></span><span id="pct-${i}"></span></div><div class="vote-bar-container"><div id="bar-${i}" class="vote-bar-fill"></div></div></div><button class="btn-vote thumb-btn" onclick="castVote(${i})">투표</button></div>`).join('')||'<p>등록된 후보가 없습니다.</p>');
             }
+            const total=state.candidates.filter(c=>c.active!==false).reduce((a,c)=>a+(Number(c.votes)||0),0);text('poll-summary',forced?'투표 대신 다음 원두를 안내합니다.':`총 ${total}표 · ${isClosed?'투표 마감':'투표 진행 중'}`);
+            if(!forced)state.candidates.forEach((c,i)=>{if(!$('votes-'+i))return;const pct=total?Math.round((Number(c.votes)||0)/total*100):0;text('votes-'+i,`${c.votes||0}표`);text('pct-'+i,pct+'%');$('bar-'+i).style.width=pct+'%';});
+            document.querySelectorAll('.thumb-btn').forEach(btn=>{btn.disabled=isClosed||pollBusy||!currentUid;const label=isClosed?'마감됨':pollBusy?'저장 중':'투표';if(btn.textContent!==label)btn.textContent=label;});
         }
-        
-        // 현황 카드에 렌더링
-        const statusCard = document.getElementById('live-status-card');
-        if(statusCard) {
-            statusCard.style.cssText = nextRankStyle;
-            statusCard.style.margin = '15px';
-            document.getElementById('live-status-content').innerHTML = nextRankContent;
-            statusCard.querySelector('h3').innerText = nextRankTitle;
-        }
-
-        // [🗳️ 투표 탭 화면 독립출력 - 투표 리스트가 제자리를 찾았습니다]
-        if(state.forceNext && state.forceNext.enabled) {
-            const nextBean = state.candidates[state.forceNext.beanIndex];
-            document.getElementById('poll-summary').innerHTML = ''; 
-            if (nextBean) {
-                document.getElementById('poll-list').innerHTML = `
-                    <div style="border: 2px solid #e91e63; padding: 20px; border-radius: 12px; background: #fff5f8;">
-                        <h3 style="color:#e91e63; margin-top:0;">📢 다음 원두 확정!</h3>
-                        <p style="font-size:14px; color:#333; line-height: 1.5;">유통기한 관리를 위해 다음 원두는 <strong>[${nextBean.name}]</strong>(으)로 진행하겠습니다.</p>
-                        ${nextBean.img ? `<img src="${nextBean.img}" onclick="window.zoomImg(this.src)" style="width:100%; max-height:200px; object-fit:contain; border-radius:10px; margin-bottom:10px; background:#fff; cursor:zoom-in;">` : ''}
-                        <div style="margin-bottom: 10px;">${nextBean.notes ? nextBean.notes.split(',').map(n => `<span class="note-badge" style="background:#ffdce5;">${n.trim()}</span>`).join('') : ''}</div>
-                        ${nextBean.recipe ? `<div class="recipe-box" style="border-left-color: #e91e63; background: #fff;">${nextBean.recipe}</div>` : ''}
-                        <button class="btn-main" onclick="window.navTo('home', '현재 원두 평가', document.getElementById('nav-home'))" style="background:#e91e63; margin-top:15px; width:100%;">확인 (현재 원두 평가로 돌아가기)</button>
-                    </div>`;
-            } else { document.getElementById('poll-list').innerHTML = "<div style='padding:20px; text-align:center;'>강제 지정 데이터 없음</div>"; }
-        } else {
-            const activeCandidates = state.candidates.filter(c => c.active !== false); const totalVotes = activeCandidates.reduce((sum, c) => sum + c.votes, 0);
-            let summaryHtml = "";
-            if(totalVotes > 0) {
-                let maxVotes = 0; let topCand = ""; let segments = "";
-                state.candidates.forEach((c, i) => {
-                    if(c.active === false) return; if (c.votes > maxVotes) { maxVotes = c.votes; topCand = c.name; }
-                    if (c.votes > 0) {
-                        const pct = (c.votes / totalVotes) * 100; const color = graphColors[i % graphColors.length];
-                        segments += `<div class="stacked-segment" style="width:${pct}%; background:${color};"></div>`;
-                    }
-                });
-                summaryHtml = `<div style="background:#fafafa; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #eee;">
-                        <div style="font-size:13px; color:#555; margin-bottom:8px;">현재 1위: <strong style="color:var(--primary);">🏆 ${topCand}</strong></div>
-                        <div class="stacked-bar">${segments}</div></div>`;
-            } else { summaryHtml = `<div style="padding:15px; text-align:center; color:#999; font-size:13px; background:#fafafa; border-radius:12px; margin-bottom:20px; border:1px dashed #ddd;">아직 투표 내역이 없습니다.</div>`; }
-            document.getElementById('poll-summary').innerHTML = summaryHtml;
-
-            document.getElementById('poll-list').innerHTML = state.candidates.map((c, i) => {
-                if(c.active === false) return ''; const percent = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0;
-                const imgSrc = c.img ? c.img : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23eee'/%3E%3Ctext x='50%25' y='50%25' fill='%23999' font-size='10' font-family='sans-serif' text-anchor='middle' dy='.3em'%3ENo Img%3C/text%3E%3C/svg%3E";
-                const barColor = graphColors[i % graphColors.length];
-                return `<div class="thumb-item">
-                        <img src="${imgSrc}" class="thumb-img" onclick="openCandModal(${i})">
-                        <div class="thumb-info" onclick="openCandModal(${i})">
-                            <div class="thumb-name">${c.name}</div>
-                            <div class="vote-info" style="font-size:11px;"><span>${c.votes}표</span><span>${percent}%</span></div>
-                            <div class="vote-bar-container" style="margin:5px 0 0 0; height:6px;"><div class="vote-bar-fill" style="width:${percent}%; background:${barColor};"></div></div>
-                        </div>
-                        <button class="btn-vote thumb-btn" onclick="castVote(${i})" ${isClosed ? 'disabled' : ''}>${isClosed ? '마감됨' : '투표'}</button>
-                    </div>`;
-            }).join('') || "<div style='padding:20px; text-align:center; color:#999; font-size:14px;'>관리자가 후보를 등록할 때까지 기다려주세요.</div>";
-        }
-
-        // [⚙️ 관리자 화면 렌더링 스크립트]
+        if(activeTab==='admin'&&changed('admin',[ui,state.forceNext,state.candidates.map(c=>[c.name,c.active]),state.status]))renderAdmin();
+    };
+    function renderAdmin(){const ui=state.ui,isClosed=state.status==='closed';
         const featureManage=document.getElementById('admin-feature-manage');
         if(featureManage) featureManage.innerHTML=`
             <h3 style="margin-top:0;">화면 기능 설정 ⚙️</h3>
@@ -577,7 +329,7 @@
             <div class="feature-row"><div class="feature-label"><strong>원두 정보관</strong><small>원두 정보와 테이스팅 노트 조회</small></div><label class="switch"><input type="checkbox" ${ui.enableInfoMode?'checked':''} onchange="toggleFeature('info')"><span class="slider"></span></label></div>
             <div class="feature-row"><div class="feature-label"><strong>강제 지정 자동 복귀</strong><small>10초 뒤 홈으로 이동</small></div><label class="switch"><input type="checkbox" ${ui.autoReturnPoll?'checked':''} onchange="toggleFeature('return')"><span class="slider"></span></label></div>`;
         const forceEnabled = state.forceNext && state.forceNext.enabled;
-        let selectOptions = state.candidates.map((c, i) => `<option value="${i}" ${state.forceNext.beanIndex == i ? 'selected' : ''}>${c.name}</option>`).join('');
+        let selectOptions = state.candidates.map((c, i) => `<option value="${i}" ${state.forceNext.beanIndex == i ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
         document.getElementById('admin-force-manage').innerHTML = `
             <h3 style="margin-top:0;">다음 원두 강제 지정 📢</h3>
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
@@ -590,7 +342,7 @@
         document.getElementById('admin-poll-manage').innerHTML = state.candidates.map((c, i) => {
             const isActive = c.active !== false; 
             return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:14px; opacity: ${isActive ? '1' : '0.5'}; flex-wrap: wrap; gap: 5px;">
-                <span style="flex:1; min-width: 120px; font-weight: 500;">${c.name} ${isActive ? '' : '<span style="color:red; font-size:11px;">(숨김)</span>'}</span>
+                <span style="flex:1; min-width: 120px; font-weight: 500;">${esc(c.name)} ${isActive ? '' : '<span style="color:red; font-size:11px;">(숨김)</span>'}</span>
                 <div style="display:flex; gap: 5px;">
                     <button onclick="setCandidateAsCurrent(${i})" style="width:auto; padding:5px 10px; background:#4CAF50; color:white; border-radius:5px; font-size:12px;">현재원두로 올리기</button>
                     <button onclick="toggleCandidate(${i})" style="width:auto; padding:5px 10px; background:${isActive ? '#777' : 'var(--primary)'}; color:white; border-radius:5px; font-size:12px;">${isActive ? '숨기기' : '활성화'}</button>
@@ -605,9 +357,9 @@
             toggleBtn.innerText = isClosed ? "투표 다시 열기 (잠금 해제)" : "투표 마감하기 (버튼 잠금)";
             toggleBtn.style.background = isClosed ? "#000" : "var(--primary)";
         }
-    };
 
-    window.resetApp = function() { if(confirm("전체 초기화하시겠습니까?")) { state = defaultState; saveToServer("초기화 완료"); } }
+    }
+    window.resetApp = function() { if(confirm("전체 초기화하시겠습니까?")) { state = structuredClone(defaultState); saveToServer("초기화 완료"); } }
 
     window.toggleVoting = async function() {
         if(!state) return; if(!state.status) state.status = "open"; 
@@ -675,5 +427,5 @@
         await saveToServer();
     };
 </script>
-</body>
+<script>document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('img-modal').style.display='none';document.getElementById('cand-modal').style.display='none';}});</script></body>
 </html>
