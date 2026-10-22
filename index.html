@@ -5,7 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>커피 매니저 · 태블릿 v2026.10.22-r4</title>
+    <title>커피 매니저 · 태블릿 v2026.10.22-r5</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -30,7 +30,7 @@
 </div>
 
 <div class="container">
-    <header><h1 id="page-title">오늘의 커피</h1><span class="build">태블릿 v2026.10.22-r4</span></header><div class="connection-row"><span id="connection" role="status">서버 연결 확인 중</span><button onclick="window.retryConnection?.()">연결 재시도</button></div>
+    <header><h1 id="page-title">오늘의 커피</h1><span class="build">태블릿 v2026.10.22-r5</span></header><div class="connection-row"><span id="connection" role="status">서버 연결 확인 중</span><button onclick="window.retryConnection?.()">연결 재시도</button></div>
 
     <main id="content-area">
         <section id="section-home">
@@ -122,7 +122,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { initializeFirestore, doc, getDoc, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -136,7 +136,10 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = initializeFirestore(app, {
+        experimentalAutoDetectLongPolling: true,
+        useFetchStreams: false
+    });
     const auth = getAuth(app); 
     const docRef = doc(db, "coffeeApp", "sharedData");
 
@@ -445,10 +448,17 @@
             }
             data.push([ idx + 1, arc.date || "날짜없음", arc.beanName || "", arc.taste ? arc.taste.good : 0, arc.taste ? arc.taste.bad : 0, topCandName, topCandVotes ]);
         });
-        const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(data);
-        ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 30}, {wch: 10}, {wch: 10}, {wch: 25}, {wch: 10} ];
-        XLSX.utils.book_append_sheet(wb, ws, "시즌기록");
-        try { XLSX.writeFile(wb, "커피매니저_시즌기록.xlsx"); } catch (e) { alert("엑셀 생성 오류"); }
+        if(window.XLSX) {
+            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(data);
+            ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 30}, {wch: 10}, {wch: 10}, {wch: 25}, {wch: 10} ];
+            XLSX.utils.book_append_sheet(wb, ws, "시즌기록");
+            try { XLSX.writeFile(wb, "커피매니저_시즌기록.xlsx"); } catch (e) { alert("엑셀 생성 오류"); }
+        } else {
+            const csv='\uFEFF'+data.map(row=>row.map(value=>'"'+String(value??'').replaceAll('"','""')+'"').join(',')).join('\r\n');
+            const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+            const a=document.createElement('a'); a.href=url; a.download='커피매니저_시즌기록.csv'; a.click(); URL.revokeObjectURL(url);
+            alert('XLSX 모듈이 차단되어 Excel에서 열 수 있는 CSV로 저장했습니다.');
+        }
     }
 
     window.toggleCandidate = function(i) {
